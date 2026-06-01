@@ -1,45 +1,4 @@
-# Esports Archive — Flask Migration
-
-## What Changed
-
-### Files Removed / Gutted
-| Item | Before | After |
-|------|--------|-------|
-| `DB` object | Entire localStorage CRUD layer | **Removed** |
-| `initDatabase()` | Loaded seed JSON → localStorage | **Removed** |
-| `Auth.login/logout/getSession` | Read/write `localStorage` session key | Now calls `POST /api/login`, `POST /api/logout`, `GET /api/session` |
-| `globalSearch()` | Iterated `DB.getAll(*)` in-memory | Now calls `GET /api/search?q=` |
-| `getDynamicStats()` | Counted from localStorage | Now calls `GET /api/stats` |
-| `teamLogoHTML()` / `playerAvatarHTML()` | Called `DB.getMedia()` | Now calls `Api.getMedia()` (fetch) |
-
-### Functions Added (app.js)
-| Function | Description |
-|----------|-------------|
-| `Api.getAll(entity)` | `GET /api/{entity}` |
-| `Api.getById(entity, id)` | `GET /api/{entity}/{id}` |
-| `Api.add(entity, record)` | `POST /api/{entity}` |
-| `Api.update(entity, record)` | `PUT /api/{entity}` |
-| `Api.delete(entity, id)` | `DELETE /api/{entity}?id=` |
-| `Api.getSettings()` | `GET /api/settings` |
-| `Api.saveSettings(data)` | `POST /api/settings` |
-| `Api.getMedia()` | `GET /api/media` |
-| `Api.saveMedia(obj)` | `POST /api/media` |
-| `Api.getStats()` | `GET /api/stats` |
-| `teamLogoHTMLSync()` | Sync fallback (no fetch, for list renders) |
-| `playerAvatarHTMLSync()` | Sync fallback |
-
-### Functions Added (app.py)
-| Function | Description |
-|----------|-------------|
-| `read_json(filename)` | Read JSON from `database/` folder |
-| `write_json(filename, data)` | Write JSON to `database/` folder |
-| `generate_id(name)` | Create URL-friendly slug IDs |
-| `make_crud(filename)` | Factory: returns GET/POST/PUT/DELETE handler |
-| `_generate_sitemap()` | Auto-generates `sitemap.xml` |
-| `_meta_page(...)` | Injects SEO meta tags into HTML |
-| `startup()` | Runs on first boot, ensures sitemap exists |
-
----
+# Esports Archive 
 
 ## How to Run
 
@@ -64,12 +23,6 @@ gunicorn -w 4 -b 0.0.0.0:5000 app:app
 
 ## API Endpoints
 
-### Auth
-```
-POST /api/login         Body: {"username":"admin","password":"neeraj"}
-POST /api/logout
-GET  /api/session
-```
 
 ### Data (all support GET, POST, PUT, DELETE)
 ```
