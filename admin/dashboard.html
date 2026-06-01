@@ -1,0 +1,1073 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin Dashboard — Esports Archive</title>
+<link rel="stylesheet" href="../assets/css/style.css">
+<style>
+/* ADMIN LAYOUT */
+.admin-wrap { display: grid; grid-template-columns: 240px 1fr; min-height: 100vh; padding-top: var(--nav-h); }
+.admin-sidebar {
+  background: var(--ash); border-right: 1px solid var(--soot);
+  padding: 2rem 0; position: sticky; top: var(--nav-h);
+  height: calc(100vh - var(--nav-h)); overflow-y: auto;
+}
+.admin-sidebar-title { font-family: 'Space Mono', monospace; font-size: 9px; letter-spacing: 2px; text-transform: uppercase; color: var(--cinder); padding: 0 1.5rem; margin-bottom: .75rem; }
+.admin-nav-item {
+  display: flex; align-items: center; gap: 10px;
+  padding: .75rem 1.5rem; font-size: 14px; font-weight: 600;
+  color: var(--pale); cursor: pointer; transition: var(--trans);
+  border-left: 3px solid transparent;
+}
+.admin-nav-item:hover { color: var(--cream); background: rgba(255,74,0,0.05); }
+.admin-nav-item.active { color: var(--fire); border-left-color: var(--fire); background: rgba(255,74,0,0.07); }
+.admin-nav-item .icon { font-size: 16px; width: 20px; text-align: center; }
+.admin-nav-sep { height: 1px; background: var(--soot); margin: 1rem 0; }
+
+.admin-content { padding: 2rem; }
+.admin-panel { display: none; }
+.admin-panel.active { display: block; }
+
+/* ADMIN PANEL HEADER */
+.admin-panel-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.5rem; }
+.admin-panel-title { font-family: 'Bebas Neue', sans-serif; font-size: 2rem; letter-spacing: 3px; color: var(--white); }
+
+/* STATS ROW */
+.admin-stats { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 1px; background: rgba(255,74,0,0.15); border: 1px solid rgba(255,74,0,0.15); margin-bottom: 2rem; }
+.admin-stat { background: var(--coal); padding: 1.25rem; text-align: center; }
+.admin-stat-num { font-family: 'Bebas Neue', sans-serif; font-size: 2rem; letter-spacing: 2px; color: var(--fire); line-height: 1; display: block; }
+.admin-stat-label { font-family: 'Space Mono', monospace; font-size: 9px; color: var(--cinder); letter-spacing: 1px; text-transform: uppercase; margin-top: 4px; display: block; }
+
+/* ADMIN TABLE */
+.admin-table { width: 100%; border-collapse: collapse; }
+.admin-table th { background: var(--smoke); font-family: 'Space Mono', monospace; font-size: 9px; letter-spacing: 1.5px; text-transform: uppercase; color: var(--cinder); padding: .75rem 1rem; text-align: left; border-bottom: 1px solid var(--soot); }
+.admin-table td { padding: .75rem 1rem; border-bottom: 1px solid rgba(255,255,255,0.04); font-size: 14px; font-weight: 500; color: var(--cream); vertical-align: middle; }
+.admin-table tr:hover td { background: rgba(255,74,0,0.03); }
+.admin-table-wrap { background: var(--ash); border: 1px solid var(--soot); border-radius: var(--radius); overflow: hidden; overflow-x: auto; }
+
+/* ACTION BTNS */
+.action-btns { display: flex; gap: 6px; }
+.btn-edit { background: rgba(255,140,0,0.1); color: var(--ember); border: 1px solid rgba(255,140,0,0.3); padding: 4px 10px; font-size: 11px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; cursor: pointer; border-radius: var(--radius); transition: var(--trans); }
+.btn-edit:hover { background: var(--ember); color: var(--white); }
+.btn-delete { background: rgba(204,34,0,0.1); color: var(--red); border: 1px solid rgba(204,34,0,0.3); padding: 4px 10px; font-size: 11px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; cursor: pointer; border-radius: var(--radius); transition: var(--trans); }
+.btn-delete:hover { background: var(--red); color: var(--white); }
+
+/* MODAL OVERRIDES FOR ADMIN */
+.admin-modal .modal { max-width: 680px; }
+.admin-modal textarea { min-height: 80px; }
+
+/* SEARCH BAR IN ADMIN */
+.admin-search { background: var(--coal); border: 1px solid var(--soot); color: var(--cream); padding: 8px 14px; font-family: 'Rajdhani', sans-serif; font-size: 14px; border-radius: var(--radius); outline: none; transition: var(--trans); width: 280px; }
+.admin-search:focus { border-color: var(--fire); }
+
+/* BADGE */
+.role-badge { font-family: 'Space Mono', monospace; font-size: 9px; letter-spacing: 1px; text-transform: uppercase; padding: 2px 8px; border-radius: 1px; }
+.role-admin { background: rgba(255,74,0,0.1); color: var(--fire); border: 1px solid rgba(255,74,0,0.3); }
+
+/* CONFIRM OVERLAY */
+.confirm-overlay {
+  position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 3000;
+  display: none; align-items: center; justify-content: center;
+}
+.confirm-overlay.open { display: flex; }
+.confirm-box {
+  background: var(--ash); border: 1px solid var(--soot); border-top: 3px solid var(--red);
+  border-radius: var(--radius); padding: 2rem; max-width: 400px; width: 100%; text-align: center;
+}
+.confirm-box h3 { font-family: 'Bebas Neue', sans-serif; font-size: 1.5rem; letter-spacing: 2px; color: var(--white); margin-bottom: .75rem; }
+.confirm-box p { color: var(--pale); font-size: 14px; margin-bottom: 1.5rem; }
+.confirm-actions { display: flex; gap: 1rem; justify-content: center; }
+
+@media (max-width: 768px) {
+  .admin-wrap { grid-template-columns: 1fr; }
+  .admin-sidebar { display: none; position: relative; height: auto; }
+}
+</style>
+</head>
+<body>
+<nav></nav>
+<div class="mobile-menu" id="mobileMenu"></div>
+
+<div class="admin-wrap">
+  <!-- SIDEBAR -->
+  <div class="admin-sidebar">
+    <div class="admin-sidebar-title">Dashboard</div>
+    <div class="admin-nav-item active" onclick="showPanel('overview')" id="nav-overview">
+      <span class="icon">📊</span> Overview
+    </div>
+    <div class="admin-nav-sep"></div>
+    <div class="admin-sidebar-title">Content</div>
+    <div class="admin-nav-item" onclick="showPanel('tournaments')" id="nav-tournaments">
+      <span class="icon">🏆</span> Tournaments
+    </div>
+    <div class="admin-nav-item" onclick="showPanel('teams')" id="nav-teams">
+      <span class="icon">🛡️</span> Teams
+    </div>
+    <div class="admin-nav-item" onclick="showPanel('players')" id="nav-players">
+      <span class="icon">👤</span> Players
+    </div>
+    <div class="admin-nav-item" onclick="showPanel('articles')" id="nav-articles">
+      <span class="icon">📰</span> Articles
+    </div>
+    <div class="admin-nav-sep"></div>
+    <div class="admin-sidebar-title">Events</div>
+    <div class="admin-nav-item" onclick="showPanel('timeline')" id="nav-timeline">
+      <span class="icon">📅</span> Timeline Events
+    </div>
+    <div class="admin-nav-item" onclick="showPanel('upcoming')" id="nav-upcoming">
+      <span class="icon">🗓️</span> Upcoming Events
+    </div>
+    <div class="admin-nav-sep"></div>
+    <div class="admin-sidebar-title">System</div>
+    <div class="admin-nav-item" onclick="showPanel('users')" id="nav-users">
+      <span class="icon">👥</span> Users
+    </div>
+    <div class="admin-nav-item" onclick="showPanel('settings')" id="nav-settings">
+      <span class="icon">⚙️</span> Settings
+    </div>
+    <div class="admin-nav-sep"></div>
+    <div class="admin-nav-item" onclick="location.href='../index.html'">
+      <span class="icon">←</span> Back to Site
+    </div>
+  </div>
+
+  <!-- MAIN CONTENT -->
+  <div class="admin-content">
+
+    <!-- OVERVIEW PANEL -->
+    <div class="admin-panel active" id="panel-overview">
+      <div class="admin-panel-header">
+        <h2 class="admin-panel-title">DASHBOARD OVERVIEW</h2>
+      </div>
+      <div class="admin-stats" id="overviewStats"></div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;">
+        <div>
+          <div class="info-block-title" style="font-family:'Bebas Neue',sans-serif;font-size:1.1rem;letter-spacing:3px;color:var(--white);margin-bottom:1rem;padding-bottom:.75rem;border-bottom:1px solid var(--soot);">Recent Tournaments</div>
+          <div id="recentTournaments" class="admin-table-wrap"></div>
+        </div>
+        <div>
+          <div class="info-block-title" style="font-family:'Bebas Neue',sans-serif;font-size:1.1rem;letter-spacing:3px;color:var(--white);margin-bottom:1rem;padding-bottom:.75rem;border-bottom:1px solid var(--soot);">Recent Articles</div>
+          <div id="recentArticles" class="admin-table-wrap"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TOURNAMENTS PANEL -->
+    <div class="admin-panel" id="panel-tournaments">
+      <div class="admin-panel-header">
+        <h2 class="admin-panel-title">TOURNAMENTS</h2>
+        <button class="btn-primary" onclick="openTournamentModal()">+ Add Tournament</button>
+      </div>
+      <div style="margin-bottom:1rem;"><input class="admin-search" placeholder="Search tournaments…" oninput="filterAdminTable('tournaments',this.value)"></div>
+      <div class="admin-table-wrap"><table class="admin-table" id="tournamentsTable"><thead><tr><th>Name</th><th>Year</th><th>Champion</th><th>Prize Pool</th><th>Status</th><th>Actions</th></tr></thead><tbody id="tournamentsBody"></tbody></table></div>
+    </div>
+
+    <!-- TEAMS PANEL -->
+    <div class="admin-panel" id="panel-teams">
+      <div class="admin-panel-header">
+        <h2 class="admin-panel-title">TEAMS</h2>
+        <button class="btn-primary" onclick="openTeamModal()">+ Add Team</button>
+      </div>
+      <div style="margin-bottom:1rem;"><input class="admin-search" placeholder="Search teams…" oninput="filterAdminTable('teams',this.value)"></div>
+      <div class="admin-table-wrap"><table class="admin-table" id="teamsTable"><thead><tr><th>Name</th><th>Short</th><th>Region</th><th>Status</th><th>Championships</th><th>Actions</th></tr></thead><tbody id="teamsBody"></tbody></table></div>
+    </div>
+
+    <!-- PLAYERS PANEL -->
+    <div class="admin-panel" id="panel-players">
+      <div class="admin-panel-header">
+        <h2 class="admin-panel-title">PLAYERS</h2>
+        <button class="btn-primary" onclick="openPlayerModal()">+ Add Player</button>
+      </div>
+      <div style="margin-bottom:1rem;"><input class="admin-search" placeholder="Search players…" oninput="filterAdminTable('players',this.value)"></div>
+      <div class="admin-table-wrap"><table class="admin-table" id="playersTable"><thead><tr><th>IGN</th><th>Real Name</th><th>Role</th><th>Team</th><th>Status</th><th>Actions</th></tr></thead><tbody id="playersBody"></tbody></table></div>
+    </div>
+
+    <!-- ARTICLES PANEL -->
+    <div class="admin-panel" id="panel-articles">
+      <div class="admin-panel-header">
+        <h2 class="admin-panel-title">ARTICLES</h2>
+        <button class="btn-primary" onclick="openArticleModal()">+ Add Article</button>
+      </div>
+      <div style="margin-bottom:1rem;"><input class="admin-search" placeholder="Search articles…" oninput="filterAdminTable('articles',this.value)"></div>
+      <div class="admin-table-wrap"><table class="admin-table" id="articlesTable"><thead><tr><th>Title</th><th>Category</th><th>Author</th><th>Date</th><th>Featured</th><th>Actions</th></tr></thead><tbody id="articlesBody"></tbody></table></div>
+    </div>
+
+    <!-- TIMELINE PANEL -->
+    <div class="admin-panel" id="panel-timeline">
+      <div class="admin-panel-header">
+        <h2 class="admin-panel-title">TIMELINE EVENTS</h2>
+        <button class="btn-primary" onclick="openTimelineModal()">+ Add Event</button>
+      </div>
+      <div class="admin-table-wrap"><table class="admin-table" id="timelineTable"><thead><tr><th>Year</th><th>Title</th><th>Type</th><th>Significance</th><th>Actions</th></tr></thead><tbody id="timelineBody"></tbody></table></div>
+    </div>
+
+    <!-- UPCOMING PANEL -->
+    <div class="admin-panel" id="panel-upcoming">
+      <div class="admin-panel-header">
+        <h2 class="admin-panel-title">UPCOMING EVENTS</h2>
+        <button class="btn-primary" onclick="openUpcomingModal()">+ Add Event</button>
+      </div>
+      <div class="admin-table-wrap"><table class="admin-table" id="upcomingTable"><thead><tr><th>Name</th><th>Date</th><th>Organizer</th><th>Prize</th><th>Status</th><th>Actions</th></tr></thead><tbody id="upcomingBody"></tbody></table></div>
+    </div>
+
+    <!-- USERS PANEL -->
+    <div class="admin-panel" id="panel-users">
+      <div class="admin-panel-header">
+        <h2 class="admin-panel-title">USERS</h2>
+        <button class="btn-primary" onclick="openUserModal()">+ Add User</button>
+      </div>
+      <div class="admin-table-wrap"><table class="admin-table" id="usersTable"><thead><tr><th>Username</th><th>Display Name</th><th>Role</th><th>Created</th><th>Actions</th></tr></thead><tbody id="usersBody"></tbody></table></div>
+    </div>
+
+    <!-- SETTINGS PANEL -->
+    <div class="admin-panel" id="panel-settings">
+      <div class="admin-panel-header">
+        <h2 class="admin-panel-title">SETTINGS</h2>
+      </div>
+      <div style="max-width:600px;">
+        <div class="info-block" style="background:var(--ash);border:1px solid var(--soot);border-radius:var(--radius);padding:1.5rem;margin-bottom:1.5rem;">
+          <div style="font-family:'Bebas Neue',sans-serif;font-size:1.1rem;letter-spacing:3px;color:var(--white);margin-bottom:1rem;border-bottom:1px solid var(--soot);padding-bottom:.75rem;">Site Settings</div>
+          <div class="form-group"><label>Site Name</label><input type="text" id="settingSiteName"></div>
+          <div class="form-group"><label>Subtitle</label><input type="text" id="settingSubtitle"></div>
+          <div class="form-group"><label>Description</label><textarea id="settingDesc"></textarea></div>
+          <button class="btn-primary" onclick="saveSettings()">Save Settings</button>
+        </div>
+        <div class="info-block" style="background:var(--ash);border:1px solid var(--soot);border-radius:var(--radius);padding:1.5rem;margin-bottom:1.5rem;">
+          <div style="font-family:'Bebas Neue',sans-serif;font-size:1.1rem;letter-spacing:3px;color:var(--white);margin-bottom:1rem;border-bottom:1px solid var(--soot);padding-bottom:.75rem;">Data Management</div>
+          <p style="font-size:13px;color:var(--pale);margin-bottom:1rem;">Export all data as JSON or reset to defaults.</p>
+          <div style="display:flex;gap:1rem;flex-wrap:wrap;">
+            <button class="btn-outline" onclick="exportData()">Export All Data</button>
+            <button class="btn-outline" style="color:var(--red);border-color:rgba(204,34,0,0.4);" onclick="confirmReset()">Reset to Defaults</button>
+          </div>
+        </div>
+        <div class="info-block" style="background:var(--ash);border:1px solid var(--soot);border-radius:var(--radius);padding:1.5rem;">
+          <div style="font-family:'Bebas Neue',sans-serif;font-size:1.1rem;letter-spacing:3px;color:var(--white);margin-bottom:1rem;border-bottom:1px solid var(--soot);padding-bottom:.75rem;">Change Password</div>
+          <div class="form-group"><label>New Password</label><input type="password" id="newPassword" placeholder="Enter new password"></div>
+          <div class="form-group"><label>Confirm Password</label><input type="password" id="confirmPassword" placeholder="Confirm new password"></div>
+          <button class="btn-primary" onclick="changePassword()">Update Password</button>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- end admin-content -->
+</div><!-- end admin-wrap -->
+
+<!-- TOURNAMENT MODAL -->
+<div class="modal-overlay admin-modal" id="tournamentModal">
+  <div class="modal">
+    <div class="modal-header">
+      <span class="modal-title" id="tournamentModalTitle">ADD TOURNAMENT</span>
+      <button class="modal-close" onclick="closeModal('tournamentModal')">✕</button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="t_id">
+      <div class="form-row">
+        <div class="form-group"><label>Tournament Name *</label><input type="text" id="t_name" placeholder="e.g. FFIC 2025 Season 1"></div>
+        <div class="form-group"><label>Short Name</label><input type="text" id="t_shortName" placeholder="e.g. FFIC 2025 S1"></div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label>Year *</label><input type="number" id="t_year" placeholder="2025"></div>
+        <div class="form-group"><label>Organizer</label><input type="text" id="t_organizer" placeholder="Garena India"></div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label>Start Date</label><input type="date" id="t_startDate"></div>
+        <div class="form-group"><label>End Date</label><input type="date" id="t_endDate"></div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label>Prize Pool</label><input type="text" id="t_prizePool" placeholder="₹50,00,000"></div>
+        <div class="form-group"><label>Format</label><input type="text" id="t_format" placeholder="BR League + Grand Finals"></div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label>Teams Participated</label><input type="number" id="t_teamsParticipated" placeholder="12"></div>
+        <div class="form-group"><label>Status</label>
+          <select id="t_status"><option value="completed">Completed</option><option value="ongoing">Ongoing</option><option value="upcoming">Upcoming</option></select>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label>Champion</label><input type="text" id="t_champion" placeholder="Team Name"></div>
+        <div class="form-group"><label>Runner-Up</label><input type="text" id="t_runnerUp" placeholder="Team Name"></div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label>Third Place</label><input type="text" id="t_thirdPlace" placeholder="Team Name"></div>
+        <div class="form-group"><label>MVP</label><input type="text" id="t_mvp" placeholder="Player IGN"></div>
+      </div>
+      <div class="form-group"><label>Description</label><textarea id="t_description" rows="3" placeholder="Tournament description…"></textarea></div>
+      <div class="form-group"><label>Historical Significance</label><textarea id="t_historicalSignificance" rows="2" placeholder="Why this tournament matters…"></textarea></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-outline" onclick="closeModal('tournamentModal')">Cancel</button>
+      <button class="btn-primary" onclick="saveTournament()">Save Tournament</button>
+    </div>
+  </div>
+</div>
+
+<!-- TEAM MODAL -->
+<div class="modal-overlay admin-modal" id="teamModal">
+  <div class="modal">
+    <div class="modal-header">
+      <span class="modal-title" id="teamModalTitle">ADD TEAM</span>
+      <button class="modal-close" onclick="closeModal('teamModal')">✕</button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="tm_id">
+      <div class="form-row">
+        <div class="form-group"><label>Team Name *</label><input type="text" id="tm_name" placeholder="e.g. Total Gaming Esports"></div>
+        <div class="form-group"><label>Short Name</label><input type="text" id="tm_shortName" placeholder="e.g. TGE"></div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label>Status</label>
+          <select id="tm_status"><option value="active">Active</option><option value="inactive">Inactive</option><option value="disbanded">Disbanded</option></select>
+        </div>
+        <div class="form-group"><label>Logo Color</label><input type="color" id="tm_logoColor" value="#FF4A00"></div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label>Founded Date</label><input type="date" id="tm_founded"></div>
+        <div class="form-group"><label>Disbanded Date</label><input type="date" id="tm_disbanded"></div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label>Region</label><input type="text" id="tm_region" placeholder="Mumbai, Maharashtra"></div>
+        <div class="form-group"><label>Championships</label><input type="number" id="tm_championships" value="0"></div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label>Owner</label><input type="text" id="tm_owner"></div>
+        <div class="form-group"><label>Manager</label><input type="text" id="tm_manager"></div>
+      </div>
+      <div class="form-group"><label>Coach</label><input type="text" id="tm_coach"></div>
+      <div class="form-group"><label>Bio</label><textarea id="tm_bio" rows="3" placeholder="Team biography…"></textarea></div>
+      <div class="form-group"><label>Achievements (one per line)</label><textarea id="tm_achievements" rows="3" placeholder="FFIC 2024 Champions&#10;Runner-Up FFIC 2023"></textarea></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-outline" onclick="closeModal('teamModal')">Cancel</button>
+      <button class="btn-primary" onclick="saveTeam()">Save Team</button>
+    </div>
+  </div>
+</div>
+
+<!-- PLAYER MODAL -->
+<div class="modal-overlay admin-modal" id="playerModal">
+  <div class="modal">
+    <div class="modal-header">
+      <span class="modal-title" id="playerModalTitle">ADD PLAYER</span>
+      <button class="modal-close" onclick="closeModal('playerModal')">✕</button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="p_id">
+      <div class="form-row">
+        <div class="form-group"><label>IGN (In-Game Name) *</label><input type="text" id="p_ign" placeholder="e.g. Ajjubhai"></div>
+        <div class="form-group"><label>Real Name</label><input type="text" id="p_realName" placeholder="e.g. Ajay"></div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label>Role</label><input type="text" id="p_role" placeholder="IGL / Fragger"></div>
+        <div class="form-group"><label>Status</label>
+          <select id="p_status"><option value="active">Active</option><option value="inactive">Inactive</option><option value="retired">Retired</option></select>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label>Current Team (ID)</label><input type="text" id="p_currentTeam" placeholder="total-gaming-esports"></div>
+        <div class="form-group"><label>Country</label><input type="text" id="p_country" value="India"></div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label>Region</label><input type="text" id="p_region" placeholder="Mumbai, Maharashtra"></div>
+        <div class="form-group"><label>Career Start</label><input type="date" id="p_careerStart"></div>
+      </div>
+      <div class="form-group"><label>Avatar Color</label><input type="color" id="p_avatarColor" value="#FF4A00"></div>
+      <div class="form-group"><label>Bio</label><textarea id="p_bio" rows="3" placeholder="Player biography…"></textarea></div>
+      <div class="form-group"><label>Achievements (one per line)</label><textarea id="p_achievements" rows="3" placeholder="FFIC 2024 Champion&#10;Tournament MVP"></textarea></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-outline" onclick="closeModal('playerModal')">Cancel</button>
+      <button class="btn-primary" onclick="savePlayer()">Save Player</button>
+    </div>
+  </div>
+</div>
+
+<!-- ARTICLE MODAL -->
+<div class="modal-overlay admin-modal" id="articleModal">
+  <div class="modal" style="max-width:700px;">
+    <div class="modal-header">
+      <span class="modal-title" id="articleModalTitle">ADD ARTICLE</span>
+      <button class="modal-close" onclick="closeModal('articleModal')">✕</button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="a_id">
+      <div class="form-group"><label>Title *</label><input type="text" id="a_title" placeholder="Article title…"></div>
+      <div class="form-row">
+        <div class="form-group"><label>Category</label>
+          <select id="a_category">
+            <option value="Tournament History">Tournament History</option>
+            <option value="Team History">Team History</option>
+            <option value="Player Stories">Player Stories</option>
+            <option value="Esports Milestones">Esports Milestones</option>
+          </select>
+        </div>
+        <div class="form-group"><label>Author</label><input type="text" id="a_author" value="Esports Archive Staff"></div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label>Date</label><input type="date" id="a_date"></div>
+        <div class="form-group"><label>Featured</label>
+          <select id="a_featured"><option value="false">No</option><option value="true">Yes</option></select>
+        </div>
+      </div>
+      <div class="form-group"><label>Summary</label><textarea id="a_summary" rows="2" placeholder="Brief summary…"></textarea></div>
+      <div class="form-group"><label>Content</label><textarea id="a_content" rows="5" placeholder="Full article content…"></textarea></div>
+      <div class="form-row">
+        <div class="form-group"><label>Related Tournament ID</label><input type="text" id="a_relatedTournament" placeholder="ffic-2024-s1"></div>
+        <div class="form-group"><label>Related Team ID</label><input type="text" id="a_relatedTeam" placeholder="total-gaming-esports"></div>
+      </div>
+      <div class="form-group"><label>Related Player ID</label><input type="text" id="a_relatedPlayer" placeholder="ajjubhai"></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-outline" onclick="closeModal('articleModal')">Cancel</button>
+      <button class="btn-primary" onclick="saveArticle()">Save Article</button>
+    </div>
+  </div>
+</div>
+
+<!-- TIMELINE MODAL -->
+<div class="modal-overlay admin-modal" id="timelineModal">
+  <div class="modal">
+    <div class="modal-header">
+      <span class="modal-title" id="timelineModalTitle">ADD TIMELINE EVENT</span>
+      <button class="modal-close" onclick="closeModal('timelineModal')">✕</button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="tl_id">
+      <div class="form-row">
+        <div class="form-group"><label>Year *</label><input type="text" id="tl_year" placeholder="2025"></div>
+        <div class="form-group"><label>Month</label>
+          <select id="tl_month"><option value="">—</option><option>January</option><option>February</option><option>March</option><option>April</option><option>May</option><option>June</option><option>July</option><option>August</option><option>September</option><option>October</option><option>November</option><option>December</option></select>
+        </div>
+      </div>
+      <div class="form-group"><label>Title *</label><input type="text" id="tl_title" placeholder="Event title…"></div>
+      <div class="form-group"><label>Detail</label><textarea id="tl_detail" rows="2" placeholder="Event detail…"></textarea></div>
+      <div class="form-row">
+        <div class="form-group"><label>Type</label>
+          <select id="tl_type">
+            <option value="championship">Championship</option>
+            <option value="tournament">Tournament Launch</option>
+            <option value="team-creation">Team Formation</option>
+            <option value="team-disband">Team Disbandment</option>
+            <option value="transfer">Roster Change / Transfer</option>
+            <option value="announcement">Announcement</option>
+            <option value="launch">Major Milestone</option>
+          </select>
+        </div>
+        <div class="form-group"><label>Significance</label>
+          <select id="tl_significance"><option value="major">Major</option><option value="minor">Minor</option></select>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label>Team (ID)</label><input type="text" id="tl_team" placeholder="total-gaming-esports"></div>
+        <div class="form-group"><label>Tournament (ID)</label><input type="text" id="tl_tournament" placeholder="ffic-2025-s1"></div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-outline" onclick="closeModal('timelineModal')">Cancel</button>
+      <button class="btn-primary" onclick="saveTimeline()">Save Event</button>
+    </div>
+  </div>
+</div>
+
+<!-- UPCOMING MODAL -->
+<div class="modal-overlay admin-modal" id="upcomingModal">
+  <div class="modal">
+    <div class="modal-header">
+      <span class="modal-title" id="upcomingModalTitle">ADD UPCOMING EVENT</span>
+      <button class="modal-close" onclick="closeModal('upcomingModal')">✕</button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="ue_id">
+      <div class="form-group"><label>Event Name *</label><input type="text" id="ue_name" placeholder="e.g. FFIC 2025 Season 2"></div>
+      <div class="form-row">
+        <div class="form-group"><label>Date</label><input type="date" id="ue_date"></div>
+        <div class="form-group"><label>End Date</label><input type="date" id="ue_endDate"></div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label>Organizer</label><input type="text" id="ue_organizer" placeholder="Garena India"></div>
+        <div class="form-group"><label>Format</label><input type="text" id="ue_format" placeholder="BR League + Grand Finals"></div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label>Prize Pool</label><input type="text" id="ue_prizePool" placeholder="₹50,00,000"></div>
+        <div class="form-group"><label>Team Slots</label><input type="number" id="ue_teamsSlots" placeholder="12"></div>
+      </div>
+      <div class="form-group"><label>Registration Status</label>
+        <select id="ue_registrationStatus"><option value="tba">TBA</option><option value="announced">Announced</option><option value="open">Open</option></select>
+      </div>
+      <div class="form-group"><label>Description</label><textarea id="ue_description" rows="2" placeholder="Event description…"></textarea></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-outline" onclick="closeModal('upcomingModal')">Cancel</button>
+      <button class="btn-primary" onclick="saveUpcoming()">Save Event</button>
+    </div>
+  </div>
+</div>
+
+<!-- USER MODAL -->
+<div class="modal-overlay admin-modal" id="userModal">
+  <div class="modal">
+    <div class="modal-header">
+      <span class="modal-title" id="userModalTitle">ADD USER</span>
+      <button class="modal-close" onclick="closeModal('userModal')">✕</button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="u_id">
+      <div class="form-group"><label>Username *</label><input type="text" id="u_username"></div>
+      <div class="form-group"><label>Display Name</label><input type="text" id="u_displayName"></div>
+      <div class="form-group"><label>Password *</label><input type="password" id="u_password" placeholder="Leave blank to keep existing"></div>
+      <div class="form-group"><label>Role</label>
+        <select id="u_role"><option value="admin">Admin</option></select>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-outline" onclick="closeModal('userModal')">Cancel</button>
+      <button class="btn-primary" onclick="saveUser()">Save User</button>
+    </div>
+  </div>
+</div>
+
+<!-- CONFIRM DELETE -->
+<div class="confirm-overlay" id="confirmOverlay">
+  <div class="confirm-box">
+    <h3>CONFIRM DELETE</h3>
+    <p id="confirmMsg">Are you sure you want to delete this record? This cannot be undone.</p>
+    <div class="confirm-actions">
+      <button class="btn-outline" onclick="closeConfirm()">Cancel</button>
+      <button class="btn-delete" onclick="execDelete()">Delete</button>
+    </div>
+  </div>
+</div>
+
+<script src="../assets/js/app.js"></script>
+<script>
+// Require admin
+document.addEventListener('DOMContentLoaded', async () => {
+  await Auth.requireAdmin();
+  await renderNav('admin');
+  renderFooter();
+  loadOverview();
+  loadSettingsPanel();
+  setTimeout(initFadeIn, 120);
+});
+
+// ── PANEL NAVIGATION ──────────────────────────────────────────
+function showPanel(name) {
+  document.querySelectorAll('.admin-panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.admin-nav-item').forEach(n => n.classList.remove('active'));
+  document.getElementById('panel-' + name).classList.add('active');
+  document.getElementById('nav-' + name).classList.add('active');
+  // Load panel data
+  const loaders = { tournaments: loadTournaments, teams: loadTeams, players: loadPlayers, articles: loadArticles, timeline: loadTimeline, upcoming: loadUpcoming, users: loadUsers, overview: loadOverview, settings: loadSettingsPanel };
+  if (loaders[name]) loaders[name]();
+}
+
+// ── OVERVIEW ─────────────────────────────────────────────────
+async function loadOverview() {
+  const s = await getDynamicStats();
+  document.getElementById('overviewStats').innerHTML = `
+    <div class="admin-stat"><span class="admin-stat-num">${s.tournaments}</span><span class="admin-stat-label">Tournaments</span></div>
+    <div class="admin-stat"><span class="admin-stat-num">${s.teams}</span><span class="admin-stat-label">Teams</span></div>
+    <div class="admin-stat"><span class="admin-stat-num">${s.players}</span><span class="admin-stat-label">Players</span></div>
+    <div class="admin-stat"><span class="admin-stat-num">${s.articles}</span><span class="admin-stat-label">Articles</span></div>
+    <div class="admin-stat"><span class="admin-stat-num">${s.timeline}</span><span class="admin-stat-label">Timeline Events</span></div>
+    <div class="admin-stat"><span class="admin-stat-num">${await Api.getAll('upcoming').length}</span><span class="admin-stat-label">Upcoming</span></div>`;
+
+  const t = (await Api.getAll('tournaments')).sort((a,b)=>b.year-a.year).slice(0,5);
+  document.getElementById('recentTournaments').innerHTML = `<table class="admin-table"><tbody>${t.map(x=>`<tr><td>${x.name}</td><td style="color:var(--gold)">${x.champion||'—'}</td></tr>`).join('')}</tbody></table>`;
+
+  const a = (await Api.getAll('articles')).sort((a,b)=>new Date(b.date)-new Date(a.date)).slice(0,5);
+  document.getElementById('recentArticles').innerHTML = `<table class="admin-table"><tbody>${a.map(x=>`<tr><td>${x.title}</td><td style="color:var(--fire);font-family:'Space Mono',monospace;font-size:10px;">${x.category}</td></tr>`).join('')}</tbody></table>`;
+}
+
+// ── GENERIC FILTER ────────────────────────────────────────────
+let _cachedData = {};
+async function filterAdminTable(type, q) {
+  if (!_cachedData[type]) return;
+  const filtered = q ? _cachedData[type].filter(r => JSON.stringify(r).toLowerCase().includes(q.toLowerCase())) : _cachedData[type];
+  renderTableBody(type, filtered);
+}
+
+// ── TOURNAMENTS ───────────────────────────────────────────────
+async function loadTournaments() {
+  _cachedData.tournaments = (await Api.getAll('tournaments')).sort((a,b)=>b.year-a.year);
+  renderTableBody('tournaments', _cachedData.tournaments);
+}
+async function renderTableBody(type, data) {
+  const map = { tournaments: renderTournamentsBody, teams: renderTeamsBody, players: renderPlayersBody, articles: renderArticlesBody };
+  if (map[type]) map[type](data);
+}
+async function renderTournamentsBody(list) {
+  document.getElementById('tournamentsBody').innerHTML = list.map(t=>`
+    <tr>
+      <td><strong>${t.name}</strong></td>
+      <td style="color:var(--cinder)">${t.year}</td>
+      <td style="color:var(--gold)">${t.champion||'—'}</td>
+      <td>${t.prizePool||'—'}</td>
+      <td><span class="status-badge ${t.status==='completed'?'status-active':'status-announced'}">${t.status}</span></td>
+      <td><div class="action-btns">
+        <button class="btn-edit" onclick="openTournamentModal('${t.id}')">Edit</button>
+        <button class="btn-delete" onclick="confirmDelete('tournaments','${t.id}','tournament &quot;${t.name}&quot;')">Del</button>
+      </div></td>
+    </tr>`).join('') || '<tr><td colspan="6" style="text-align:center;color:var(--cinder);">No tournaments found.</td></tr>';
+}
+
+async function openTournamentModal(id) {
+  const modal = document.getElementById('tournamentModal');
+  const fields = ['id','name','shortName','year','organizer','startDate','endDate','prizePool','format','teamsParticipated','status','champion','runnerUp','thirdPlace','mvp','description','historicalSignificance'];
+  fields.forEach(f => { const el = document.getElementById('t_'+f); if(el) el.value = ''; });
+  document.getElementById('tournamentModalTitle').textContent = id ? 'EDIT TOURNAMENT' : 'ADD TOURNAMENT';
+  if (id) {
+    const t = await Api.getById('tournaments', id);
+    if (t) fields.forEach(f => { const el = document.getElementById('t_'+f); if(el && t[f]!==undefined) el.value = t[f]||''; });
+  }
+  modal.classList.add('open');
+}
+async function saveTournament() {
+  const name = document.getElementById('t_name').value.trim();
+  const year = document.getElementById('t_year').value;
+  if (!name || !year) { showToast('Name and year are required.', 'error'); return; }
+  const id = document.getElementById('t_id').value || generateId(name);
+  const record = {
+    id, name, shortName: document.getElementById('t_shortName').value||'',
+    year: parseInt(year)||new Date().getFullYear(),
+    organizer: document.getElementById('t_organizer').value||'',
+    startDate: document.getElementById('t_startDate').value||'',
+    endDate: document.getElementById('t_endDate').value||'',
+    prizePool: document.getElementById('t_prizePool').value||'',
+    format: document.getElementById('t_format').value||'',
+    teamsParticipated: parseInt(document.getElementById('t_teamsParticipated').value)||0,
+    status: document.getElementById('t_status').value||'completed',
+    champion: document.getElementById('t_champion').value||'',
+    runnerUp: document.getElementById('t_runnerUp').value||'',
+    thirdPlace: document.getElementById('t_thirdPlace').value||'',
+    mvp: document.getElementById('t_mvp').value||'',
+    description: document.getElementById('t_description').value||'',
+    historicalSignificance: document.getElementById('t_historicalSignificance').value||'',
+    participatingTeams: [], standings: [], relatedArticles: []
+  };
+  const existing = await Api.getById('tournaments', id);
+  if (existing) await Api.update('tournaments', {id: id, ...record}); else await Api.add('tournaments', record);
+  closeModal('tournamentModal');
+  loadTournaments();
+  showToast('Tournament saved!', 'success');
+}
+
+// ── TEAMS ─────────────────────────────────────────────────────
+async function loadTeams() {
+  _cachedData.teams = (await Api.getAll('teams')).sort((a,b)=>a.name.localeCompare(b.name));
+  renderTeamsBody(_cachedData.teams);
+}
+async function renderTeamsBody(list) {
+  document.getElementById('teamsBody').innerHTML = list.map(t=>`
+    <tr>
+      <td><strong>${t.name}</strong></td>
+      <td style="color:var(--fire)">${t.shortName||'—'}</td>
+      <td style="color:var(--cinder)">${t.region||'—'}</td>
+      <td><span class="status-badge ${getStatusClass(t.status)}">${t.status}</span></td>
+      <td style="color:var(--gold)">${t.championships||0}</td>
+      <td><div class="action-btns">
+        <button class="btn-edit" onclick="openTeamModal('${t.id}')">Edit</button>
+        <button class="btn-delete" onclick="confirmDelete('teams','${t.id}','team &quot;${t.name}&quot;')">Del</button>
+      </div></td>
+    </tr>`).join('') || '<tr><td colspan="6" style="text-align:center;color:var(--cinder);">No teams found.</td></tr>';
+}
+async function openTeamModal(id) {
+  const fields = ['id','name','shortName','status','founded','disbanded','region','championships','owner','manager','coach','bio'];
+  fields.forEach(f => { const el = document.getElementById('tm_'+f); if(el) el.value=''; });
+  document.getElementById('tm_achievements').value='';
+  document.getElementById('tm_logoColor').value='#FF4A00';
+  document.getElementById('teamModalTitle').textContent = id ? 'EDIT TEAM' : 'ADD TEAM';
+  if (id) {
+    const t = await Api.getById('teams', id);
+    if (t) {
+      fields.forEach(f => { const el = document.getElementById('tm_'+f); if(el && t[f]!==undefined) el.value=t[f]||''; });
+      if (t.logoColor) document.getElementById('tm_logoColor').value=t.logoColor;
+      document.getElementById('tm_achievements').value=(t.achievements||[]).join('\n');
+    }
+  }
+  document.getElementById('teamModal').classList.add('open');
+}
+async function saveTeam() {
+  const name = document.getElementById('tm_name').value.trim();
+  if (!name) { showToast('Team name is required.', 'error'); return; }
+  const id = document.getElementById('tm_id').value || generateId(name);
+  const record = {
+    id, name, shortName: document.getElementById('tm_shortName').value||'',
+    status: document.getElementById('tm_status').value||'active',
+    logoColor: document.getElementById('tm_logoColor').value||'#FF4A00',
+    founded: document.getElementById('tm_founded').value||'',
+    disbanded: document.getElementById('tm_disbanded').value||null,
+    region: document.getElementById('tm_region').value||'',
+    championships: parseInt(document.getElementById('tm_championships').value)||0,
+    owner: document.getElementById('tm_owner').value||'',
+    manager: document.getElementById('tm_manager').value||'',
+    coach: document.getElementById('tm_coach').value||'',
+    bio: document.getElementById('tm_bio').value||'',
+    achievements: document.getElementById('tm_achievements').value.split('\n').map(s=>s.trim()).filter(Boolean),
+    currentRoster: await Api.getById('teams', id)?.currentRoster||[],
+    formerPlayers: await Api.getById('teams', id)?.formerPlayers||[],
+    tournamentHistory: await Api.getById('teams', id)?.tournamentHistory||[]
+  };
+  const existing = await Api.getById('teams', id);
+  if (existing) await Api.update('teams', {id: id, ...record}); else await Api.add('teams', record);
+  closeModal('teamModal');
+  loadTeams();
+  showToast('Team saved!', 'success');
+}
+
+// ── PLAYERS ───────────────────────────────────────────────────
+async function loadPlayers() {
+  _cachedData.players = (await Api.getAll('players')).sort((a,b)=>a.ign.localeCompare(b.ign));
+  renderPlayersBody(_cachedData.players);
+}
+async function renderPlayersBody(list) {
+  const teams = await Api.getAll('teams');
+  document.getElementById('playersBody').innerHTML = list.map(p=>{
+    const team = p.currentTeam ? teams.find(t=>t.id===p.currentTeam) : null;
+    return `<tr>
+      <td><strong>${p.ign}</strong></td>
+      <td style="color:var(--cinder)">${p.realName||'—'}</td>
+      <td style="color:var(--pale)">${p.role||'—'}</td>
+      <td style="color:var(--fire)">${team?team.name:(p.currentTeam||'Free Agent')}</td>
+      <td><span class="status-badge ${getStatusClass(p.status)}">${p.status}</span></td>
+      <td><div class="action-btns">
+        <button class="btn-edit" onclick="openPlayerModal('${p.id}')">Edit</button>
+        <button class="btn-delete" onclick="confirmDelete('players','${p.id}','player &quot;${p.ign}&quot;')">Del</button>
+      </div></td>
+    </tr>`;
+  }).join('') || '<tr><td colspan="6" style="text-align:center;color:var(--cinder);">No players found.</td></tr>';
+}
+async function openPlayerModal(id) {
+  const fields = ['id','ign','realName','role','status','currentTeam','country','region','careerStart','bio'];
+  fields.forEach(f => { const el = document.getElementById('p_'+f); if(el) el.value=''; });
+  document.getElementById('p_achievements').value='';
+  document.getElementById('p_avatarColor').value='#FF4A00';
+  document.getElementById('p_country').value='India';
+  document.getElementById('playerModalTitle').textContent = id ? 'EDIT PLAYER' : 'ADD PLAYER';
+  if (id) {
+    const p = await Api.getById('players', id);
+    if (p) {
+      fields.forEach(f => { const el = document.getElementById('p_'+f); if(el && p[f]!==undefined) el.value=p[f]||''; });
+      if (p.avatarColor) document.getElementById('p_avatarColor').value=p.avatarColor;
+      document.getElementById('p_achievements').value=(p.achievements||[]).join('\n');
+    }
+  }
+  document.getElementById('playerModal').classList.add('open');
+}
+async function savePlayer() {
+  const ign = document.getElementById('p_ign').value.trim();
+  if (!ign) { showToast('IGN is required.', 'error'); return; }
+  const id = document.getElementById('p_id').value || generateId(ign);
+  const record = {
+    id, ign, realName: document.getElementById('p_realName').value||'',
+    role: document.getElementById('p_role').value||'',
+    status: document.getElementById('p_status').value||'active',
+    currentTeam: document.getElementById('p_currentTeam').value||'',
+    country: document.getElementById('p_country').value||'India',
+    region: document.getElementById('p_region').value||'',
+    careerStart: document.getElementById('p_careerStart').value||'',
+    avatarColor: document.getElementById('p_avatarColor').value||'#FF4A00',
+    bio: document.getElementById('p_bio').value||'',
+    achievements: document.getElementById('p_achievements').value.split('\n').map(s=>s.trim()).filter(Boolean),
+    careerTimeline: await Api.getById('players', id)?.careerTimeline||[],
+    formerTeams: await Api.getById('players', id)?.formerTeams||[],
+    tournamentHistory: await Api.getById('players', id)?.tournamentHistory||[],
+    statistics: await Api.getById('players', id)?.statistics||{}
+  };
+  const existing = await Api.getById('players', id);
+  if (existing) await Api.update('players', {id: id, ...record}); else await Api.add('players', record);
+  closeModal('playerModal');
+  loadPlayers();
+  showToast('Player saved!', 'success');
+}
+
+// ── ARTICLES ──────────────────────────────────────────────────
+async function loadArticles() {
+  _cachedData.articles = (await Api.getAll('articles')).sort((a,b)=>new Date(b.date)-new Date(a.date));
+  renderArticlesBody(_cachedData.articles);
+}
+async function renderArticlesBody(list) {
+  document.getElementById('articlesBody').innerHTML = list.map(a=>`
+    <tr>
+      <td style="max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;"><strong>${a.title}</strong></td>
+      <td style="color:var(--fire);font-family:'Space Mono',monospace;font-size:10px;">${a.category}</td>
+      <td style="color:var(--cinder)">${a.author||'—'}</td>
+      <td style="color:var(--cinder)">${formatDate(a.date)}</td>
+      <td>${a.featured?'<span style="color:var(--gold)">★</span>':'—'}</td>
+      <td><div class="action-btns">
+        <button class="btn-edit" onclick="openArticleModal('${a.id}')">Edit</button>
+        <button class="btn-delete" onclick="confirmDelete('articles','${a.id}','article &quot;${a.title.substring(0,30)}&quot;')">Del</button>
+      </div></td>
+    </tr>`).join('') || '<tr><td colspan="6" style="text-align:center;color:var(--cinder);">No articles found.</td></tr>';
+}
+async function openArticleModal(id) {
+  const fields = ['id','title','author','date','summary','content','relatedTournament','relatedTeam','relatedPlayer'];
+  fields.forEach(f => { const el = document.getElementById('a_'+f); if(el) el.value=''; });
+  document.getElementById('a_featured').value='false';
+  document.getElementById('a_category').value='Tournament History';
+  document.getElementById('articleModalTitle').textContent = id ? 'EDIT ARTICLE' : 'ADD ARTICLE';
+  if (id) {
+    const a = await Api.getById('articles', id);
+    if (a) {
+      fields.forEach(f => { const el = document.getElementById('a_'+f); if(el && a[f]!==undefined) el.value=a[f]||''; });
+      if (a.category) document.getElementById('a_category').value=a.category;
+      document.getElementById('a_featured').value=a.featured?'true':'false';
+    }
+  }
+  document.getElementById('articleModal').classList.add('open');
+}
+async function saveArticle() {
+  const title = document.getElementById('a_title').value.trim();
+  if (!title) { showToast('Title is required.', 'error'); return; }
+  const id = document.getElementById('a_id').value || generateId(title);
+  const record = {
+    id, title, category: document.getElementById('a_category').value,
+    author: document.getElementById('a_author').value||'Esports Archive Staff',
+    date: document.getElementById('a_date').value||new Date().toISOString().split('T')[0],
+    summary: document.getElementById('a_summary').value||'',
+    content: document.getElementById('a_content').value||'',
+    relatedTournament: document.getElementById('a_relatedTournament').value||null,
+    relatedTeam: document.getElementById('a_relatedTeam').value||null,
+    relatedPlayer: document.getElementById('a_relatedPlayer').value||null,
+    featured: document.getElementById('a_featured').value==='true'
+  };
+  const existing = await Api.getById('articles', id);
+  if (existing) await Api.update('articles', {id: id, ...record}); else await Api.add('articles', record);
+  closeModal('articleModal');
+  loadArticles();
+  showToast('Article saved!', 'success');
+}
+
+// ── TIMELINE ──────────────────────────────────────────────────
+async function loadTimeline() {
+  const items = (await Api.getAll('timeline')).sort((a,b)=>b.year-a.year);
+  document.getElementById('timelineBody').innerHTML = items.map(t=>`
+    <tr>
+      <td style="color:var(--fire);font-family:'Bebas Neue',sans-serif;font-size:1.1rem;">${t.year}${t.month?' · '+t.month:''}</td>
+      <td><strong>${t.title}</strong></td>
+      <td style="color:var(--cinder);font-family:'Space Mono',monospace;font-size:10px;">${t.type||'—'}</td>
+      <td><span class="status-badge ${t.significance==='major'?'status-active':'status-announced'}">${t.significance||'minor'}</span></td>
+      <td><div class="action-btns">
+        <button class="btn-edit" onclick="openTimelineModal('${t.id}')">Edit</button>
+        <button class="btn-delete" onclick="confirmDelete('timeline','${t.id}','timeline event &quot;${t.title}&quot;')">Del</button>
+      </div></td>
+    </tr>`).join('') || '<tr><td colspan="5" style="text-align:center;color:var(--cinder);">No timeline events found.</td></tr>';
+}
+async function openTimelineModal(id) {
+  const fields = ['id','year','title','detail','team','tournament'];
+  fields.forEach(f => { const el = document.getElementById('tl_'+f); if(el) el.value=''; });
+  document.getElementById('tl_month').value='';
+  document.getElementById('tl_type').value='championship';
+  document.getElementById('tl_significance').value='major';
+  document.getElementById('timelineModalTitle').textContent = id ? 'EDIT TIMELINE EVENT' : 'ADD TIMELINE EVENT';
+  if (id) {
+    const t = await Api.getById('timeline', id);
+    if (t) {
+      fields.forEach(f => { const el = document.getElementById('tl_'+f); if(el && t[f]!==undefined) el.value=t[f]||''; });
+      if (t.month) document.getElementById('tl_month').value=t.month;
+      if (t.type) document.getElementById('tl_type').value=t.type;
+      if (t.significance) document.getElementById('tl_significance').value=t.significance;
+    }
+  }
+  document.getElementById('timelineModal').classList.add('open');
+}
+async function saveTimeline() {
+  const title = document.getElementById('tl_title').value.trim();
+  const year = document.getElementById('tl_year').value;
+  if (!title || !year) { showToast('Year and title are required.', 'error'); return; }
+  const id = document.getElementById('tl_id').value || generateId(title);
+  const record = {
+    id, year, month: document.getElementById('tl_month').value||'',
+    title, detail: document.getElementById('tl_detail').value||'',
+    type: document.getElementById('tl_type').value||'announcement',
+    significance: document.getElementById('tl_significance').value||'minor',
+    team: document.getElementById('tl_team').value||'',
+    tournament: document.getElementById('tl_tournament').value||''
+  };
+  const existing = await Api.getById('timeline', id);
+  if (existing) await Api.update('timeline', {id: id, ...record}); else await Api.add('timeline', record);
+  closeModal('timelineModal');
+  loadTimeline();
+  showToast('Timeline event saved!', 'success');
+}
+
+// ── UPCOMING ──────────────────────────────────────────────────
+async function loadUpcoming() {
+  const items = (await Api.getAll('upcoming')).sort((a,b)=>new Date(a.date)-new Date(b.date));
+  document.getElementById('upcomingBody').innerHTML = items.map(e=>`
+    <tr>
+      <td><strong>${e.name}</strong></td>
+      <td style="color:var(--cinder)">${formatDate(e.date)}</td>
+      <td>${e.organizer||'—'}</td>
+      <td style="color:var(--gold)">${e.prizePool||'TBA'}</td>
+      <td><span class="upcoming-status ${getRegStatusClass(e.registrationStatus)}">${getRegStatusLabel(e.registrationStatus)}</span></td>
+      <td><div class="action-btns">
+        <button class="btn-edit" onclick="openUpcomingModal('${e.id}')">Edit</button>
+        <button class="btn-delete" onclick="confirmDelete('upcoming','${e.id}','event &quot;${e.name}&quot;')">Del</button>
+      </div></td>
+    </tr>`).join('') || '<tr><td colspan="6" style="text-align:center;color:var(--cinder);">No upcoming events found.</td></tr>';
+}
+async function openUpcomingModal(id) {
+  const fields = ['id','name','date','endDate','organizer','format','prizePool','teamsSlots','description'];
+  fields.forEach(f => { const el = document.getElementById('ue_'+f); if(el) el.value=''; });
+  document.getElementById('ue_registrationStatus').value='tba';
+  document.getElementById('upcomingModalTitle').textContent = id ? 'EDIT UPCOMING EVENT' : 'ADD UPCOMING EVENT';
+  if (id) {
+    const e = await Api.getById('upcoming', id);
+    if (e) {
+      fields.forEach(f => { const el = document.getElementById('ue_'+f); if(el && e[f]!==undefined) el.value=e[f]||''; });
+      if (e.registrationStatus) document.getElementById('ue_registrationStatus').value=e.registrationStatus;
+    }
+  }
+  document.getElementById('upcomingModal').classList.add('open');
+}
+async function saveUpcoming() {
+  const name = document.getElementById('ue_name').value.trim();
+  if (!name) { showToast('Event name is required.', 'error'); return; }
+  const id = document.getElementById('ue_id').value || generateId(name);
+  const record = {
+    id, name, date: document.getElementById('ue_date').value||'',
+    endDate: document.getElementById('ue_endDate').value||'',
+    organizer: document.getElementById('ue_organizer').value||'',
+    format: document.getElementById('ue_format').value||'',
+    prizePool: document.getElementById('ue_prizePool').value||'TBA',
+    teamsSlots: parseInt(document.getElementById('ue_teamsSlots').value)||null,
+    registrationStatus: document.getElementById('ue_registrationStatus').value||'tba',
+    description: document.getElementById('ue_description').value||''
+  };
+  const existing = await Api.getById('upcoming', id);
+  if (existing) await Api.update('upcoming', {id: id, ...record}); else await Api.add('upcoming', record);
+  closeModal('upcomingModal');
+  loadUpcoming();
+  showToast('Upcoming event saved!', 'success');
+}
+
+// ── USERS ─────────────────────────────────────────────────────
+async function loadUsers() {
+  const users = await Api.getAll('users');
+  document.getElementById('usersBody').innerHTML = users.map(u=>`
+    <tr>
+      <td><strong>${u.username}</strong></td>
+      <td>${u.displayName||'—'}</td>
+      <td><span class="role-badge role-admin">${u.role}</span></td>
+      <td style="color:var(--cinder)">${formatDate(u.createdAt)}</td>
+      <td><div class="action-btns">
+        <button class="btn-edit" onclick="openUserModal(${u.id})">Edit</button>
+        ${users.length>1?`<button class="btn-delete" onclick="confirmDelete('users','${u.id}','user &quot;${u.username}&quot;')">Del</button>`:''}
+      </div></td>
+    </tr>`).join('');
+}
+async function openUserModal(id) {
+  document.getElementById('u_id').value='';
+  document.getElementById('u_username').value='';
+  document.getElementById('u_displayName').value='';
+  document.getElementById('u_password').value='';
+  document.getElementById('u_role').value='admin';
+  document.getElementById('userModalTitle').textContent = id ? 'EDIT USER' : 'ADD USER';
+  if (id) {
+    const u = (await Api.getAll('users')).find(u=>u.id===id);
+    if (u) {
+      document.getElementById('u_id').value=u.id;
+      document.getElementById('u_username').value=u.username||'';
+      document.getElementById('u_displayName').value=u.displayName||'';
+      document.getElementById('u_role').value=u.role||'admin';
+    }
+  }
+  document.getElementById('userModal').classList.add('open');
+}
+function saveUser() {
+  const username = document.getElementById('u_username').value.trim();
+  if (!username) { showToast('Username is required.', 'error'); return; }
+  const existingId = document.getElementById('u_id').value;
+  const password = document.getElementById('u_password').value;
+  if (!existingId && !password) { showToast('Password is required for new users.', 'error'); return; }
+  const all = await Api.getAll('users');
+  if (existingId) {
+    const idx = all.findIndex(u=>String(u.id)===String(existingId));
+    if (idx>-1) {
+      all[idx].username=username;
+      all[idx].displayName=document.getElementById('u_displayName').value;
+      all[idx].role=document.getElementById('u_role').value;
+      if (password) all[idx].password=password;
+      await Api.update('users', all[idx]);
+    }
+  } else {
+    const newUser = { id: Date.now(), username, displayName: document.getElementById('u_displayName').value, password, role: document.getElementById('u_role').value, createdAt: new Date().toISOString().split('T')[0] };
+    await Api.add('users', newUser);
+  }
+  closeModal('userModal');
+  loadUsers();
+  showToast('User saved!', 'success');
+}
+
+// ── SETTINGS ──────────────────────────────────────────────────
+async function loadSettingsPanel() {
+  const s = await Api.getSettings();
+  document.getElementById('settingSiteName').value = s.siteName||'Esports Archive';
+  document.getElementById('settingSubtitle').value = s.siteSubtitle||'';
+  document.getElementById('settingDesc').value = s.description||'';
+}
+async function saveSettings() {
+  await Api.saveSettings({
+    siteName: document.getElementById('settingSiteName').value,
+    siteSubtitle: document.getElementById('settingSubtitle').value,
+    description: document.getElementById('settingDesc').value
+  });
+  showToast('Settings saved!', 'success');
+}
+async function exportData() {
+  const data = {
+    tournaments: await Api.getAll('tournaments'),
+    teams: await Api.getAll('teams'),
+    players: await Api.getAll('players'),
+    timeline: await Api.getAll('timeline'),
+    articles: await Api.getAll('articles'),
+    upcoming: await Api.getAll('upcoming'),
+    settings: await Api.getSettings()
+  };
+  const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+  const a = document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='esports-archive-export.json'; a.click();
+  showToast('Data exported!', 'success');
+}
+async function confirmReset() {
+  if (confirm('This will reload data from original JSON seed files. Are you sure?')) {
+    showToast('Data reset complete! Reloading…', 'success');
+    setTimeout(() => location.reload(), 1200);
+  }
+}
+async function changePassword() {
+  const np = document.getElementById('newPassword').value;
+  const cp = document.getElementById('confirmPassword').value;
+  if (!np || np !== cp) { showToast('Passwords do not match.', 'error'); return; }
+  const session = await Auth.getSession();
+  if (!session) return;
+  const users = await Api.getAll('users');
+  const idx = users.findIndex(u => u.id === session.userId);
+  if (idx > -1) { users[idx].password = np; await Api.update('users', users[idx]); showToast('Password updated!', 'success'); }
+  document.getElementById('newPassword').value='';
+  document.getElementById('confirmPassword').value='';
+}
+
+// ── DELETE CONFIRM ────────────────────────────────────────────
+let _deleteTarget = null;
+async function confirmDelete(key, id, label) {
+  _deleteTarget = { key, id };
+  document.getElementById('confirmMsg').textContent = `Are you sure you want to delete ${label}? This cannot be undone.`;
+  document.getElementById('confirmOverlay').classList.add('open');
+}
+function closeConfirm() { document.getElementById('confirmOverlay').classList.remove('open'); _deleteTarget=null; }
+async function execDelete() {
+  if (!_deleteTarget) return;
+  await Api.delete(_deleteTarget.key, _deleteTarget.id);
+  closeConfirm();
+  const loaders = { tournaments: loadTournaments, teams: loadTeams, players: loadPlayers, articles: loadArticles, timeline: loadTimeline, upcoming: loadUpcoming, users: loadUsers };
+  if (loaders[_deleteTarget.key]) loaders[_deleteTarget.key]();
+  showToast('Deleted successfully.', 'success');
+  _deleteTarget = null;
+}
+
+// ── MODAL HELPERS ─────────────────────────────────────────────
+function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+</script>
+</body>
+</html>

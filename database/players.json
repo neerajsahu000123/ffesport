@@ -1,0 +1,519 @@
+[
+  {
+    "id": "ajjubhai",
+    "ign": "Ajjubhai",
+    "realName": "Ajay",
+    "currentTeam": "total-gaming-esports",
+    "role": "IGL / Fragger",
+    "country": "India",
+    "region": "Mumbai, Maharashtra",
+    "careerStart": "2019-01-15",
+    "status": "active",
+    "avatarColor": "#FF4A00",
+    "bio": "Ajjubhai, known as the 'God of Free Fire India', is the most iconic and celebrated player in Indian Free Fire esports history. As the founder and IGL of Total Gaming Esports, he led the organization to three FFIC titles. His decision-making, game sense, and clutch performances in high-pressure situations are unmatched. Off the competitive field, Ajjubhai built one of India's largest gaming YouTube channels.",
+    "achievements": [
+      "3× FFIC Champion (2019, 2020 S1, 2021)",
+      "2× FFIC MVP",
+      "Most Tournament Wins in India",
+      "Best IGL Award (2019, 2021)",
+      "Founder — Total Gaming Esports"
+    ],
+    "statistics": {
+      "tournamentsPlayed": 8,
+      "totalWins": 3,
+      "avgKillsPerGame": 4.2,
+      "winRate": 68.4,
+      "totalPrizeMoney": "₹58,00,000"
+    },
+    "careerTimeline": [
+      {
+        "year": "2019",
+        "event": "Founded Total Gaming Esports",
+        "detail": "Established the organization from scratch alongside his YouTube channel"
+      },
+      {
+        "year": "2019",
+        "event": "FFIC 2019 S1 Champion + MVP",
+        "detail": "Led TGE to inaugural FFIC title"
+      },
+      {
+        "year": "2020",
+        "event": "FFIC 2020 S1 Champion",
+        "detail": "Defended the FFIC title back-to-back"
+      },
+      {
+        "year": "2021",
+        "event": "FFIC 2021 S1 Champion + MVP",
+        "detail": "Third FFIC title, establishing TGE as a dynasty"
+      },
+      {
+        "year": "2022",
+        "event": "TGE podium finishes",
+        "detail": "Continued competitive excellence despite no title"
+      },
+      {
+        "year": "2024",
+        "event": "Still Active",
+        "detail": "Continues to compete and mentor younger TGE roster members"
+      }
+    ],
+    "formerTeams": [],
+    "tournamentHistory": [
+      {
+        "tournament": "FFIC 2019 S1",
+        "team": "Total Gaming Esports",
+        "result": "Champion",
+        "award": "MVP"
+      },
+      {
+        "tournament": "FFIC 2020 S1",
+        "team": "Total Gaming Esports",
+        "result": "Champion",
+        "award": ""
+      },
+      {
+        "tournament": "FFIC 2020 S2",
+        "team": "Total Gaming Esports",
+        "result": "Runner-Up",
+        "award": ""
+      },
+      {
+        "tournament": "FFIC 2021 S1",
+        "team": "Total Gaming Esports",
+        "result": "Champion",
+        "award": "MVP"
+      },
+      {
+        "tournament": "FFSCC 2022",
+        "team": "Total Gaming Esports",
+        "result": "3rd Place",
+        "award": ""
+      },
+      {
+        "tournament": "FFIC 2022 S1",
+        "team": "Total Gaming Esports",
+        "result": "3rd Place",
+        "award": ""
+      },
+      {
+        "tournament": "FFIC 2023 S1",
+        "team": "Total Gaming Esports",
+        "result": "4th Place",
+        "award": ""
+      },
+      {
+        "tournament": "FFIC 2024 S1",
+        "team": "Total Gaming Esports",
+        "result": "4th Place",
+        "award": ""
+      }
+    ]
+  },
+  {
+    "id": "raistar",
+    "ign": "Raistar",
+    "realName": "Aadesh Nikam",
+    "currentTeam": "blind-esports",
+    "role": "Assaulter / Fragger",
+    "country": "India",
+    "region": "Bengaluru, Karnataka",
+    "careerStart": "2020-07-10",
+    "status": "active",
+    "avatarColor": "#00BFFF",
+    "bio": "Raistar is widely considered the most mechanically gifted player in Indian Free Fire history. Known for his insane close-range gunfights, unpredictable movement, and ability to 1v4 in clutch situations, he is the heart of Blind Esports. His two MVP awards are a testament to consistent dominance across multiple seasons.",
+    "achievements": [
+      "FFSCC 2022 Champion + MVP",
+      "FFIC 2023 S1 Champion + MVP",
+      "2× Major MVP Award",
+      "Founded Blind Esports",
+      "Highest K/D Ratio in FFIC History"
+    ],
+    "statistics": {
+      "tournamentsPlayed": 6,
+      "totalWins": 2,
+      "avgKillsPerGame": 5.8,
+      "winRate": 62.1,
+      "totalPrizeMoney": "₹55,00,000"
+    },
+    "careerTimeline": [
+      {
+        "year": "2020",
+        "event": "Founded Blind Esports",
+        "detail": "Established the organization with a vision of mechanical excellence"
+      },
+      {
+        "year": "2021",
+        "event": "FFIC 2021 S1 3rd Place",
+        "detail": "Blind Esports' first FFIC podium"
+      },
+      {
+        "year": "2022",
+        "event": "FFSCC 2022 Champion + MVP",
+        "detail": "First major title for Blind Esports"
+      },
+      {
+        "year": "2022",
+        "event": "FFIC 2022 S1 Runner-Up",
+        "detail": "Back-to-back finals appearances"
+      },
+      {
+        "year": "2023",
+        "event": "FFIC 2023 S1 Champion + MVP",
+        "detail": "Dominant season culminating in championship"
+      },
+      {
+        "year": "2024",
+        "event": "FFIC 2024 S1 Runner-Up",
+        "detail": "Continued top-level competition"
+      }
+    ],
+    "formerTeams": [],
+    "tournamentHistory": [
+      {
+        "tournament": "FFIC 2021 S1",
+        "team": "Blind Esports",
+        "result": "3rd Place",
+        "award": ""
+      },
+      {
+        "tournament": "FFSCC 2022",
+        "team": "Blind Esports",
+        "result": "Champion",
+        "award": "MVP"
+      },
+      {
+        "tournament": "FFIC 2022 S1",
+        "team": "Blind Esports",
+        "result": "Runner-Up",
+        "award": ""
+      },
+      {
+        "tournament": "FFIC 2023 S1",
+        "team": "Blind Esports",
+        "result": "Champion",
+        "award": "MVP"
+      },
+      {
+        "tournament": "FFIC 2024 S1",
+        "team": "Blind Esports",
+        "result": "Runner-Up",
+        "award": ""
+      }
+    ]
+  },
+  {
+    "id": "neyoo",
+    "ign": "Neyoo",
+    "realName": "Suraj Majumdar",
+    "currentTeam": "total-gaming-esports",
+    "role": "Sniper / Entry Fragger",
+    "country": "India",
+    "region": "Guwahati, Assam",
+    "careerStart": "2019-02-10",
+    "status": "active",
+    "avatarColor": "#9B59B6",
+    "bio": "Neyoo is regarded as the best sniper in Indian Free Fire history. Beginning his journey with his own squad 'Neyoo Squad', he later joined Total Gaming Esports where his long-range elimination skills became a cornerstone of the team's championship runs. His calm demeanor under pressure and precision with sniper rifles have made him a fan favorite.",
+    "achievements": [
+      "3× FFIC Champion (with TGE)",
+      "Best Sniper Award (Multiple Seasons)",
+      "FFIC 2020 S1 MVP Runner-Up"
+    ],
+    "statistics": {
+      "tournamentsPlayed": 7,
+      "totalWins": 3,
+      "avgKillsPerGame": 3.9,
+      "winRate": 64.7,
+      "totalPrizeMoney": "₹46,00,000"
+    },
+    "careerTimeline": [
+      {
+        "year": "2019",
+        "event": "Founded Neyoo Squad",
+        "detail": "Led his own team in inaugural FFIC"
+      },
+      {
+        "year": "2020",
+        "event": "Joined Total Gaming Esports",
+        "detail": "Transferred to TGE mid-2020"
+      },
+      {
+        "year": "2020",
+        "event": "FFIC 2020 S1 Champion",
+        "detail": "First major title with TGE"
+      },
+      {
+        "year": "2021",
+        "event": "FFIC 2021 S1 Champion",
+        "detail": "Third FFIC title, career peak season"
+      },
+      {
+        "year": "2022-2024",
+        "event": "Continued with TGE",
+        "detail": "Veteran presence on the TGE roster"
+      }
+    ],
+    "formerTeams": [
+      "neyoo-squad"
+    ],
+    "tournamentHistory": [
+      {
+        "tournament": "FFIC 2019 S1",
+        "team": "Neyoo Squad",
+        "result": "5th Place",
+        "award": ""
+      },
+      {
+        "tournament": "FFIC 2020 S1",
+        "team": "Total Gaming Esports",
+        "result": "Champion",
+        "award": "MVP Nominee"
+      },
+      {
+        "tournament": "FFIC 2020 S2",
+        "team": "Total Gaming Esports",
+        "result": "Runner-Up",
+        "award": ""
+      },
+      {
+        "tournament": "FFIC 2021 S1",
+        "team": "Total Gaming Esports",
+        "result": "Champion",
+        "award": ""
+      },
+      {
+        "tournament": "FFSCC 2022",
+        "team": "Total Gaming Esports",
+        "result": "3rd Place",
+        "award": ""
+      },
+      {
+        "tournament": "FFIC 2022 S1",
+        "team": "Total Gaming Esports",
+        "result": "3rd Place",
+        "award": ""
+      },
+      {
+        "tournament": "FFIC 2023 S1",
+        "team": "Total Gaming Esports",
+        "result": "4th Place",
+        "award": ""
+      }
+    ]
+  },
+  {
+    "id": "k18",
+    "ign": "K18",
+    "realName": "Kartik Sood",
+    "currentTeam": "galaxy-racer-india",
+    "role": "IGL / Support",
+    "country": "India",
+    "region": "Delhi NCR",
+    "careerStart": "2020-03-01",
+    "status": "active",
+    "avatarColor": "#7B2FFF",
+    "bio": "K18 is Galaxy Racer India's IGL and tactical mastermind. Twice an FFIC MVP winner, K18 is known for his game-reading ability, strategic zone rotations, and ability to adapt mid-game. He has also transitioned to a player-coach role, mentoring younger GRI members.",
+    "achievements": [
+      "2× FFIC Champion (2020 S2, 2022 S1)",
+      "2× FFIC MVP",
+      "Best IGL Award (2022)",
+      "Player-Coach — Galaxy Racer India"
+    ],
+    "statistics": {
+      "tournamentsPlayed": 7,
+      "totalWins": 2,
+      "avgKillsPerGame": 3.1,
+      "winRate": 61.5,
+      "totalPrizeMoney": "₹52,00,000"
+    },
+    "careerTimeline": [
+      {
+        "year": "2020",
+        "event": "Joined Galaxy Racer India",
+        "detail": "Signed as IGL for the new Indian division"
+      },
+      {
+        "year": "2020",
+        "event": "FFIC 2020 S2 Champion + MVP",
+        "detail": "Led GRI to first FFIC title"
+      },
+      {
+        "year": "2021",
+        "event": "FFIC 2021 S1 Runner-Up",
+        "detail": "Narrowly missed back-to-back titles"
+      },
+      {
+        "year": "2022",
+        "event": "FFIC 2022 S1 Champion + MVP",
+        "detail": "Second FFIC title, second MVP"
+      },
+      {
+        "year": "2023",
+        "event": "FFIC 2023 S1 Runner-Up",
+        "detail": "Strong season, just fell short of 3rd title"
+      },
+      {
+        "year": "2024",
+        "event": "Player-Coach Role",
+        "detail": "Transitioned to dual player-coach responsibilities"
+      }
+    ],
+    "formerTeams": [],
+    "tournamentHistory": [
+      {
+        "tournament": "FFIC 2020 S1",
+        "team": "Galaxy Racer India",
+        "result": "Runner-Up",
+        "award": ""
+      },
+      {
+        "tournament": "FFIC 2020 S2",
+        "team": "Galaxy Racer India",
+        "result": "Champion",
+        "award": "MVP"
+      },
+      {
+        "tournament": "FFIC 2021 S1",
+        "team": "Galaxy Racer India",
+        "result": "Runner-Up",
+        "award": ""
+      },
+      {
+        "tournament": "FFSCC 2022",
+        "team": "Galaxy Racer India",
+        "result": "4th Place",
+        "award": ""
+      },
+      {
+        "tournament": "FFIC 2022 S1",
+        "team": "Galaxy Racer India",
+        "result": "Champion",
+        "award": "MVP"
+      },
+      {
+        "tournament": "FFIC 2023 S1",
+        "team": "Galaxy Racer India",
+        "result": "Runner-Up",
+        "award": ""
+      },
+      {
+        "tournament": "FFIC 2024 S1",
+        "team": "Galaxy Racer India",
+        "result": "3rd Place",
+        "award": ""
+      }
+    ]
+  },
+  {
+    "id": "lokesh-gamer",
+    "ign": "Lokesh Gamer",
+    "realName": "Lokesh Raj",
+    "currentTeam": "yolostar-gang",
+    "role": "Fragger / Entry",
+    "country": "India",
+    "region": "Ahmedabad, Gujarat",
+    "careerStart": "2021-01-01",
+    "status": "active",
+    "avatarColor": "#FFD700",
+    "bio": "Lokesh Gamer is the breakout star of FFIC 2024. As the founder and star fragger of YoloStar Gang, he led the team to their first-ever FFIC title in a sensational performance. Known for explosive entry fragging and creative use of in-game items, Lokesh's unique playstyle makes him one of the most exciting players to watch in Indian Free Fire.",
+    "achievements": [
+      "FFIC 2024 S1 Champion + MVP",
+      "Fastest Rising Star 2023",
+      "Highest Kills in FFIC 2024 Grand Finals"
+    ],
+    "statistics": {
+      "tournamentsPlayed": 4,
+      "totalWins": 1,
+      "avgKillsPerGame": 5.1,
+      "winRate": 55.3,
+      "totalPrizeMoney": "₹50,00,000"
+    },
+    "careerTimeline": [
+      {
+        "year": "2021",
+        "event": "Founded YoloStar Gang",
+        "detail": "Established the team alongside content career"
+      },
+      {
+        "year": "2022",
+        "event": "FFIC Debut",
+        "detail": "YSG qualified for their first FFIC"
+      },
+      {
+        "year": "2023",
+        "event": "FFIC 2023 3rd Place",
+        "detail": "Breakthrough podium finish for YSG"
+      },
+      {
+        "year": "2024",
+        "event": "FFIC 2024 Champion + MVP",
+        "detail": "Historic first FFIC title, MVP award"
+      }
+    ],
+    "formerTeams": [],
+    "tournamentHistory": [
+      {
+        "tournament": "FFIC 2022 S1",
+        "team": "YoloStar Gang",
+        "result": "5th Place",
+        "award": ""
+      },
+      {
+        "tournament": "FFIC 2023 S1",
+        "team": "YoloStar Gang",
+        "result": "3rd Place",
+        "award": ""
+      },
+      {
+        "tournament": "FFIC 2024 S1",
+        "team": "YoloStar Gang",
+        "result": "Champion",
+        "award": "MVP"
+      }
+    ]
+  },
+  {
+    "id": "desi-gamers",
+    "ign": "Desi Gamers",
+    "realName": "Inaam Ullah Khan",
+    "currentTeam": null,
+    "role": "Content Creator / Former Player",
+    "country": "India",
+    "region": "Lucknow, Uttar Pradesh",
+    "careerStart": "2020-05-01",
+    "status": "retired",
+    "avatarColor": "#27AE60",
+    "bio": "Inaam, known as Desi Gamers, was one of the most popular personalities in the Indian Free Fire ecosystem. While primarily a content creator, he participated in competitive play with Desi Gamers Squad. He retired from competitive play in 2022 to focus fully on his YouTube channel, which has over 15 million subscribers.",
+    "achievements": [
+      "Multiple Third-Party Tournament Wins",
+      "Most Popular FF YouTuber (2021)"
+    ],
+    "statistics": {
+      "tournamentsPlayed": 2,
+      "totalWins": 0,
+      "avgKillsPerGame": 2.8,
+      "winRate": 40.0,
+      "totalPrizeMoney": "₹0"
+    },
+    "careerTimeline": [
+      {
+        "year": "2020",
+        "event": "Founded Desi Gamers Squad",
+        "detail": "Created a competitive team alongside content creation"
+      },
+      {
+        "year": "2021",
+        "event": "Participated in various third-party tournaments",
+        "detail": "Won multiple open-bracket events"
+      },
+      {
+        "year": "2022",
+        "event": "Retired from competitive play",
+        "detail": "Shifted focus entirely to YouTube content"
+      }
+    ],
+    "formerTeams": [
+      "desi-gamers-squad"
+    ],
+    "tournamentHistory": []
+  }
+]

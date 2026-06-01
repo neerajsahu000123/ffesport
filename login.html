@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin Login — Esports Archive</title>
+<meta name="robots" content="noindex, nofollow">
+<link rel="stylesheet" href="assets/css/style.css">
+<style>
+.login-page { min-height:100vh; display:flex; align-items:center; justify-content:center; padding:2rem; position:relative; }
+.login-bg { position:fixed; inset:0; z-index:0; background: radial-gradient(ellipse 50% 60% at 20% 50%, rgba(255,74,0,0.08) 0%, transparent 70%), radial-gradient(ellipse 40% 50% at 80% 80%, rgba(255,140,0,0.05) 0%, transparent 70%); }
+.login-box { position:relative; z-index:1; width:100%; max-width:420px; background:var(--ash); border:1px solid var(--soot); border-top:3px solid var(--fire); border-radius:var(--radius); padding:2.5rem; }
+.login-logo { display:flex; align-items:center; gap:12px; margin-bottom:2rem; justify-content:center; }
+.login-logo-icon { width:36px; height:36px; background:var(--fire); clip-path:polygon(50% 0%, 100% 100%, 0% 100%); position:relative; flex-shrink:0; }
+.login-logo-icon::after { content:''; position:absolute; top:4px; left:6px; right:6px; bottom:4px; background:var(--gold); clip-path:polygon(50% 0%, 100% 100%, 0% 100%); }
+.login-logo-text { display:flex; flex-direction:column; line-height:1; }
+.login-logo-text .brand { font-family:'Bebas Neue',sans-serif; font-size:18px; letter-spacing:3px; color:var(--white); }
+.login-logo-text .sub { font-family:'Space Mono',monospace; font-size:8px; color:var(--fire); letter-spacing:1px; text-transform:uppercase; }
+.login-title { font-family:'Bebas Neue',sans-serif; font-size:2rem; letter-spacing:3px; color:var(--white); text-align:center; margin-bottom:.5rem; }
+.login-subtitle { font-family:'Space Mono',monospace; font-size:10px; color:var(--cinder); text-align:center; letter-spacing:1.5px; text-transform:uppercase; margin-bottom:2rem; }
+.login-divider { border:none; border-top:1px solid var(--soot); margin:1.5rem 0; }
+.login-error { background:rgba(204,34,0,0.1); border:1px solid rgba(204,34,0,0.3); color:var(--red); padding:10px 14px; font-size:13px; font-weight:600; border-radius:var(--radius); margin-bottom:1rem; display:none; }
+.login-error.show { display:block; }
+.login-btn { width:100%; padding:14px; background:var(--fire); color:var(--white); border:none; cursor:pointer; font-family:'Bebas Neue',sans-serif; font-size:1.1rem; letter-spacing:3px; border-radius:var(--radius); transition:var(--trans); margin-top:.5rem; }
+.login-btn:hover { background:var(--ember); }
+.login-back { text-align:center; margin-top:1.5rem; }
+.login-back a { font-family:'Space Mono',monospace; font-size:10px; color:var(--cinder); letter-spacing:1px; text-transform:uppercase; transition:var(--trans); }
+.login-back a:hover { color:var(--fire); }
+</style>
+</head>
+<body>
+<div class="login-bg"></div>
+<div class="login-page">
+  <div class="login-box">
+    <div class="login-logo">
+      <div class="login-logo-icon"></div>
+      <div class="login-logo-text">
+        <span class="brand">ESPORTS ARCHIVE</span>
+        <span class="sub">Indian Free Fire Esports Database</span>
+      </div>
+    </div>
+    <h1 class="login-title">ADMIN LOGIN</h1>
+    <p class="login-subtitle">// Restricted Access · Admins Only</p>
+    <hr class="login-divider">
+    <div class="login-error" id="loginError">Invalid username or password.</div>
+    <div class="form-group">
+      <label for="username">Username</label>
+      <input type="text" id="username" placeholder="Enter username" autocomplete="username" onkeydown="if(event.key==='Enter')doLogin()">
+    </div>
+    <div class="form-group">
+      <label for="password">Password</label>
+      <input type="password" id="password" placeholder="Enter password" autocomplete="current-password" onkeydown="if(event.key==='Enter')doLogin()">
+    </div>
+    <button class="login-btn" onclick="doLogin()">LOGIN TO DASHBOARD</button>
+    <div class="login-back"><a href="index.html">← Back to Archive</a></div>
+  </div>
+</div>
+<script src="assets/js/app.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', async () => {
+  if (await Auth.isAdmin()) {
+    const redirect = getParam('redirect');
+    window.location.href = redirect === 'admin' ? 'admin/dashboard.html' : 'index.html';
+  }
+});
+
+async function doLogin() {
+  const username = document.getElementById('username').value.trim();
+  const password = document.getElementById('password').value;
+  const errorEl  = document.getElementById('loginError');
+  if (!username || !password) {
+    errorEl.textContent = 'Please enter both username and password.';
+    errorEl.classList.add('show'); return;
+  }
+  const success = await Auth.login(username, password);
+  if (success) {
+    errorEl.classList.remove('show');
+    showToast('Login successful! Redirecting…', 'success');
+    setTimeout(() => {
+      const redirect = getParam('redirect');
+      window.location.href = (redirect === 'admin') ? 'admin/dashboard.html' : 'index.html';
+    }, 800);
+  } else {
+    errorEl.textContent = 'Invalid username or password.';
+    errorEl.classList.add('show');
+    document.getElementById('password').value = '';
+    document.getElementById('password').focus();
+  }
+}
+</script>
+</body>
+</html>

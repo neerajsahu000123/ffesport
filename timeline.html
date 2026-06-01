@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Timeline — Esports Archive</title>
+<link rel="stylesheet" href="assets/css/style.css">
+<style>
+.year-nav { display:flex; gap:8px; flex-wrap:wrap; margin-bottom:3rem; position:sticky; top:var(--nav-h); background:var(--coal); z-index:10; padding:1rem 0; border-bottom:1px solid rgba(255,74,0,0.1); }
+.year-nav-btn { font-family:'Bebas Neue',sans-serif; font-size:1.1rem; letter-spacing:2px; color:var(--cinder); background:transparent; border:none; cursor:pointer; padding:4px 8px; transition:var(--trans); border-bottom:2px solid transparent; }
+.year-nav-btn:hover { color:var(--fire); }
+.year-nav-btn.active { color:var(--fire); border-bottom-color:var(--fire); }
+.type-filter-row { display:flex; gap:6px; flex-wrap:wrap; margin-bottom:2rem; }
+</style>
+</head>
+<body>
+<nav></nav>
+<div class="mobile-menu" id="mobileMenu"></div>
+
+<section class="page-hero">
+  <div class="container">
+    <div class="breadcrumb"><a href="index.html">Home</a><span class="sep">›</span><span class="current">Timeline</span></div>
+    <span class="page-hero-tag">// Historical Timeline</span>
+    <h1 class="page-hero-title">TIMELINE</h1>
+    <p class="page-hero-desc">The complete chronological history of Indian Free Fire esports — from the game's launch in 2018 to present day.</p>
+  </div>
+</section>
+
+<section class="section-pad">
+  <div class="container">
+    <!-- YEAR NAV -->
+    <div class="year-nav" id="yearNav"></div>
+
+    <!-- TYPE FILTERS -->
+    <div class="type-filter-row" id="typeFilters">
+      <button class="filter-btn active" data-type="all" onclick="setTypeFilter(this)">All Events</button>
+      <button class="filter-btn" data-type="championship" onclick="setTypeFilter(this)"><span style="color:var(--gold);">🏆</span> Championships</button>
+      <button class="filter-btn" data-type="tournament" onclick="setTypeFilter(this)">🎮 Tournaments</button>
+      <button class="filter-btn" data-type="team-creation" onclick="setTypeFilter(this)">🟢 Team Creations</button>
+      <button class="filter-btn" data-type="team-disband" onclick="setTypeFilter(this)">🔴 Disbands</button>
+      <button class="filter-btn" data-type="transfer" onclick="setTypeFilter(this)">🔄 Transfers</button>
+      <button class="filter-btn" data-type="announcement" onclick="setTypeFilter(this)">📢 Announcements</button>
+    </div>
+
+    <!-- TIMELINE -->
+    <div id="timelineContainer">
+      <div class="loading-state">Loading timeline…</div>
+    </div>
+  </div>
+</section>
+
+<footer></footer>
+<script src="assets/js/app.js"></script>
+<script>
+let allEvents = [];
+let activeType = 'all';
+
+document.addEventListener('DOMContentLoaded', async () => {
+  await renderNav('timeline');
+  renderFooter();
+  await loadTimeline();
+  setTimeout(initFadeIn, 120);
+});
+
+async function loadTimeline() {
+  allEvents = (await Api.getAll('timeline')).sort((a,b)=>new Date(a.date)-new Date(b.date));
+  const years = [...new Set(allEvents.map(e=>e.year))].sort((a,b)=>a-b);
+
+  // Build year nav
+  const yearNav = document.getElementById('yearNav');
+  years.forEach(y=>{
+    const btn = document.createElement('button');
+    btn.className = 'year-nav-btn';
+    btn.textContent = y;
+    btn.dataset.year = y;
+    btn.onclick = ()=>scrollToYear(y);
+    yearNav.appendChild(btn);
+  });
+
+  renderTimeline(allEvents);
+}
+
+function setTypeFilter(btn) {
+  document.querySelectorAll('#typeFilters .filter-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  activeType = btn.dataset.type;
+  let list = allEvents;
+  if (activeType !== 'all') list = allEvents.filter(e=>e.type===activeType);
+  renderTimeline(list);
+}
+
+function scrollToYear(y) {
+  const el = document.getElementById(`year-${y}`);
+  if (el) el.scrollIntoView({behavior:'smooth', block:'start'});
+}
+
+function renderTimeline(events) {
+  if (!events.length) {
+    document.getElementById('timelineContainer').innerHTML = '<div class="empty-state"><h3>No Events</h3><p>Try a different filter.</p></div>';
+    return;
+  }
+
+  // Group by year
+  const grouped = {};
+  events.forEach(e=>{
+    if (!grouped[e.year]) grouped[e.year]=[];
+    grouped[e.year].push(e);
+  });
+
+  const html = Object.entries(grouped).map(([year,items])=>`
+    <div class="timeline-year-group fade-in" id="year-${year}">
+      <div class="timeline-year">${year}</div>
+      <div class="timeline" style="padding-left:2rem;">
+        ${items.map(item=>`
+          <div class="timeline-item">
+            <div class="timeline-dot ${getDotClass(item.type)}"></div>
+            <div style="flex:1;">
+              <div class="timeline-content">
+                <span class="timeline-type-badge ${getTypeClass(item.type)}">${item.type.replace(/-/g,' ')}</span>
+                <div class="timeline-date">${item.month||''} ${item.year} ${item.date?'· '+formatDate(item.date):''}</div>
+                <div class="timeline-event">${item.title}</div>
+                <div class="timeline-detail">${item.detail}</div>
+                <div style="display:flex;gap:.5rem;margin-top:.5rem;flex-wrap:wrap;">
+                  ${item.relatedTeam?`<a href="team-detail.html?id=${item.relatedTeam}" style="font-family:'Space Mono',monospace;font-size:9px;color:var(--fire);letter-spacing:1px;border:1px solid rgba(255,74,0,0.2);padding:2px 8px;">→ Team</a>`:''}
+                  ${item.relatedPlayer?`<a href="player-detail.html?id=${item.relatedPlayer}" style="font-family:'Space Mono',monospace;font-size:9px;color:var(--ember);letter-spacing:1px;border:1px solid rgba(255,140,0,0.2);padding:2px 8px;">→ Player</a>`:''}
+                  ${item.relatedTournament?`<a href="tournament-detail.html?id=${item.relatedTournament}" style="font-family:'Space Mono',monospace;font-size:9px;color:var(--gold);letter-spacing:1px;border:1px solid rgba(255,194,0,0.2);padding:2px 8px;">→ Tournament</a>`:''}
+                </div>
+              </div>
+            </div>
+          </div>`).join('')}
+      </div>
+    </div>`).join('');
+
+  document.getElementById('timelineContainer').innerHTML = html;
+  setTimeout(initFadeIn, 50);
+
+  // Highlight active year on scroll
+  const yearGroups = document.querySelectorAll('.timeline-year-group');
+  const navBtns = document.querySelectorAll('.year-nav-btn');
+  const obs = new IntersectionObserver(entries=>{
+    entries.forEach(e=>{
+      if(e.isIntersecting){
+        const y = e.target.id.replace('year-','');
+        navBtns.forEach(b=>b.classList.toggle('active',b.dataset.year==y));
+      }
+    });
+  },{threshold:0.2});
+  yearGroups.forEach(g=>obs.observe(g));
+}
+</script>
+</body>
+</html>

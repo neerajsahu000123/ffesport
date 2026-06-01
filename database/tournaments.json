@@ -1,0 +1,562 @@
+[
+  {
+    "id": "ffic-2019-s1",
+    "name": "Free Fire India Championship 2019 — Season 1",
+    "shortName": "FFIC 2019 S1",
+    "year": 2019,
+    "startDate": "2019-09-01",
+    "endDate": "2019-11-15",
+    "organizer": "Garena India",
+    "format": "BR League + Grand Finals",
+    "prizePool": "₹30,00,000",
+    "prizePoolUSD": 40000,
+    "teamsParticipated": 12,
+    "champion": "Total Gaming Esports",
+    "runnerUp": "Team Elite",
+    "mvp": "Ajjubhai",
+    "thirdPlace": "Blind Esports",
+    "status": "completed",
+    "banner": "",
+    "description": "The inaugural Free Fire India Championship marked the beginning of organized competitive Free Fire esports in India. Garena India launched this landmark tournament with 12 of the country's top squads competing across online qualifiers and a grand offline finals held in Mumbai. Total Gaming Esports, led by the legendary Ajjubhai, dominated the competition to claim the first-ever FFIC title.",
+    "historicalSignificance": "First major organized Free Fire tournament in India. Established the FFIC brand as the premier circuit for competitive play.",
+    "participatingTeams": [
+      "total-gaming-esports",
+      "team-elite",
+      "blind-esports",
+      "team-chaos",
+      "neyoo-squad",
+      "desi-gamers-squad"
+    ],
+    "standings": [
+      {
+        "rank": 1,
+        "team": "Total Gaming Esports",
+        "points": 189,
+        "kills": 87,
+        "prize": "₹15,00,000"
+      },
+      {
+        "rank": 2,
+        "team": "Team Elite",
+        "points": 154,
+        "kills": 71,
+        "prize": "₹8,00,000"
+      },
+      {
+        "rank": 3,
+        "team": "Blind Esports",
+        "points": 132,
+        "kills": 63,
+        "prize": "₹4,00,000"
+      },
+      {
+        "rank": 4,
+        "team": "Team Chaos",
+        "points": 118,
+        "kills": 58,
+        "prize": "₹2,00,000"
+      },
+      {
+        "rank": 5,
+        "team": "Neyoo Squad",
+        "points": 102,
+        "kills": 51,
+        "prize": "₹1,00,000"
+      }
+    ],
+    "relatedArticles": [
+      "article-ffic-2019-recap",
+      "article-ajjubhai-legend"
+    ]
+  },
+  {
+    "id": "ffic-2020-s1",
+    "name": "Free Fire India Championship 2020 — Season 1",
+    "shortName": "FFIC 2020 S1",
+    "year": 2020,
+    "startDate": "2020-02-10",
+    "endDate": "2020-05-20",
+    "organizer": "Garena India",
+    "format": "Online League (COVID-adjusted)",
+    "prizePool": "₹40,00,000",
+    "prizePoolUSD": 54000,
+    "teamsParticipated": 16,
+    "champion": "Total Gaming Esports",
+    "runnerUp": "Galaxy Racer India",
+    "mvp": "Neyoo",
+    "thirdPlace": "Team Chaos",
+    "status": "completed",
+    "banner": "",
+    "description": "The 2020 S1 championship was a landmark event, entirely conducted online due to the COVID-19 pandemic. Despite the unprecedented challenge, Garena India delivered a seamless competition with 16 teams. Total Gaming Esports defended their title in a dominant fashion, while Galaxy Racer India emerged as a strong challenger.",
+    "historicalSignificance": "First fully online FFIC due to COVID-19. Set the standard for remote esports tournaments in India.",
+    "participatingTeams": [
+      "total-gaming-esports",
+      "galaxy-racer-india",
+      "team-chaos",
+      "blind-esports",
+      "team-elite",
+      "desi-gamers-squad"
+    ],
+    "standings": [
+      {
+        "rank": 1,
+        "team": "Total Gaming Esports",
+        "points": 212,
+        "kills": 96,
+        "prize": "₹18,00,000"
+      },
+      {
+        "rank": 2,
+        "team": "Galaxy Racer India",
+        "points": 178,
+        "kills": 82,
+        "prize": "₹10,00,000"
+      },
+      {
+        "rank": 3,
+        "team": "Team Chaos",
+        "points": 145,
+        "kills": 69,
+        "prize": "₹5,00,000"
+      },
+      {
+        "rank": 4,
+        "team": "Blind Esports",
+        "points": 128,
+        "kills": 61,
+        "prize": "₹3,00,000"
+      },
+      {
+        "rank": 5,
+        "team": "Team Elite",
+        "points": 112,
+        "kills": 54,
+        "prize": "₹2,00,000"
+      }
+    ],
+    "relatedArticles": [
+      "article-covid-online-era",
+      "article-neyoo-breakthrough"
+    ]
+  },
+  {
+    "id": "ffic-2020-s2",
+    "name": "Free Fire India Championship 2020 — Season 2",
+    "shortName": "FFIC 2020 S2",
+    "year": 2020,
+    "startDate": "2020-08-01",
+    "endDate": "2020-11-10",
+    "organizer": "Garena India",
+    "format": "Online League",
+    "prizePool": "₹50,00,000",
+    "prizePoolUSD": 68000,
+    "teamsParticipated": 18,
+    "champion": "Galaxy Racer India",
+    "runnerUp": "Total Gaming Esports",
+    "mvp": "K18",
+    "thirdPlace": "YoloStar Gang",
+    "status": "completed",
+    "banner": "",
+    "description": "Galaxy Racer India finally broke through in FFIC 2020 S2, ending Total Gaming Esports' dominance in a nail-biting grand finals. K18's outstanding performance throughout the tournament earned him MVP honors. This season saw 18 teams compete, the largest field in FFIC history at that point.",
+    "historicalSignificance": "Galaxy Racer India's first FFIC title. End of Total Gaming Esports' championship streak.",
+    "participatingTeams": [
+      "galaxy-racer-india",
+      "total-gaming-esports",
+      "yolostar-gang",
+      "blind-esports",
+      "team-chaos",
+      "team-elite"
+    ],
+    "standings": [
+      {
+        "rank": 1,
+        "team": "Galaxy Racer India",
+        "points": 225,
+        "kills": 103,
+        "prize": "₹22,00,000"
+      },
+      {
+        "rank": 2,
+        "team": "Total Gaming Esports",
+        "points": 198,
+        "kills": 91,
+        "prize": "₹12,00,000"
+      },
+      {
+        "rank": 3,
+        "team": "YoloStar Gang",
+        "points": 162,
+        "kills": 77,
+        "prize": "₹6,00,000"
+      },
+      {
+        "rank": 4,
+        "team": "Blind Esports",
+        "points": 140,
+        "kills": 65,
+        "prize": "₹4,00,000"
+      },
+      {
+        "rank": 5,
+        "team": "Team Chaos",
+        "points": 119,
+        "kills": 57,
+        "prize": "₹3,00,000"
+      }
+    ],
+    "relatedArticles": [
+      "article-galaxy-racer-rise",
+      "article-k18-mvp"
+    ]
+  },
+  {
+    "id": "ffic-2021-s1",
+    "name": "Free Fire India Championship 2021 — Season 1",
+    "shortName": "FFIC 2021 S1",
+    "year": 2021,
+    "startDate": "2021-03-15",
+    "endDate": "2021-06-20",
+    "organizer": "Garena India",
+    "format": "BR League + Playoffs",
+    "prizePool": "₹60,00,000",
+    "prizePoolUSD": 81000,
+    "teamsParticipated": 20,
+    "champion": "Total Gaming Esports",
+    "runnerUp": "Galaxy Racer India",
+    "mvp": "Ajjubhai",
+    "thirdPlace": "Blind Esports",
+    "status": "completed",
+    "banner": "",
+    "description": "FFIC 2021 S1 saw the return of Total Gaming Esports to the throne in a dominant display. The expanded 20-team format brought new challengers and elevated competition levels. Ajjubhai once again claimed MVP, cementing his legacy as the greatest Free Fire player from India.",
+    "historicalSignificance": "Largest FFIC field to date. Established Total Gaming Esports as a dynasty.",
+    "participatingTeams": [
+      "total-gaming-esports",
+      "galaxy-racer-india",
+      "blind-esports",
+      "team-chaos",
+      "yolostar-gang",
+      "team-elite"
+    ],
+    "standings": [
+      {
+        "rank": 1,
+        "team": "Total Gaming Esports",
+        "points": 244,
+        "kills": 112,
+        "prize": "₹25,00,000"
+      },
+      {
+        "rank": 2,
+        "team": "Galaxy Racer India",
+        "points": 201,
+        "kills": 94,
+        "prize": "₹14,00,000"
+      },
+      {
+        "rank": 3,
+        "team": "Blind Esports",
+        "points": 168,
+        "kills": 79,
+        "prize": "₹8,00,000"
+      },
+      {
+        "rank": 4,
+        "team": "Team Chaos",
+        "points": 143,
+        "kills": 68,
+        "prize": "₹5,00,000"
+      },
+      {
+        "rank": 5,
+        "team": "YoloStar Gang",
+        "points": 127,
+        "kills": 60,
+        "prize": "₹3,00,000"
+      }
+    ],
+    "relatedArticles": [
+      "article-tge-dynasty",
+      "article-ffic-2021-recap"
+    ]
+  },
+  {
+    "id": "ffscc-2022",
+    "name": "Free Fire Skyler Circuit Championship 2022",
+    "shortName": "FFSCC 2022",
+    "year": 2022,
+    "startDate": "2022-01-10",
+    "endDate": "2022-03-05",
+    "organizer": "Garena India",
+    "format": "Online + Offline Grand Finals",
+    "prizePool": "₹45,00,000",
+    "prizePoolUSD": 60000,
+    "teamsParticipated": 24,
+    "champion": "Blind Esports",
+    "runnerUp": "Team Elite",
+    "mvp": "Raistar",
+    "thirdPlace": "Total Gaming Esports",
+    "status": "completed",
+    "banner": "",
+    "description": "The FFSCC introduced a brand new circuit format. Blind Esports, powered by Raistar's mechanical brilliance, claimed their first major title in an upset for the ages. The offline grand finals returned post-pandemic, drawing massive crowds and viewership records.",
+    "historicalSignificance": "Blind Esports' first major championship. Return of offline grand finals to India.",
+    "participatingTeams": [
+      "blind-esports",
+      "team-elite",
+      "total-gaming-esports",
+      "galaxy-racer-india",
+      "yolostar-gang",
+      "team-chaos"
+    ],
+    "standings": [
+      {
+        "rank": 1,
+        "team": "Blind Esports",
+        "points": 267,
+        "kills": 124,
+        "prize": "₹20,00,000"
+      },
+      {
+        "rank": 2,
+        "team": "Team Elite",
+        "points": 221,
+        "kills": 103,
+        "prize": "₹11,00,000"
+      },
+      {
+        "rank": 3,
+        "team": "Total Gaming Esports",
+        "points": 184,
+        "kills": 87,
+        "prize": "₹7,00,000"
+      },
+      {
+        "rank": 4,
+        "team": "Galaxy Racer India",
+        "points": 159,
+        "kills": 75,
+        "prize": "₹4,00,000"
+      },
+      {
+        "rank": 5,
+        "team": "YoloStar Gang",
+        "points": 138,
+        "kills": 65,
+        "prize": "₹2,00,000"
+      }
+    ],
+    "relatedArticles": [
+      "article-blind-first-title",
+      "article-raistar-mvp-2022"
+    ]
+  },
+  {
+    "id": "ffic-2022-s1",
+    "name": "Free Fire India Championship 2022 — Season 1",
+    "shortName": "FFIC 2022 S1",
+    "year": 2022,
+    "startDate": "2022-05-01",
+    "endDate": "2022-09-10",
+    "organizer": "Garena India",
+    "format": "BR League + Grand Finals",
+    "prizePool": "₹75,00,000",
+    "prizePoolUSD": 100000,
+    "teamsParticipated": 24,
+    "champion": "Galaxy Racer India",
+    "runnerUp": "Blind Esports",
+    "mvp": "K18",
+    "thirdPlace": "Total Gaming Esports",
+    "status": "completed",
+    "banner": "",
+    "description": "FFIC 2022 S1 was the most prize-pool-rich FFIC to date, crossing the ₹75L mark. Galaxy Racer India reclaimed their crown in a spectacular finals, with K18 winning his second MVP award. The tournament featured the largest viewership in Indian Free Fire esports history.",
+    "historicalSignificance": "Record prize pool crossing ₹75L. Record viewership for Indian Free Fire esports.",
+    "participatingTeams": [
+      "galaxy-racer-india",
+      "blind-esports",
+      "total-gaming-esports",
+      "team-elite",
+      "yolostar-gang",
+      "team-chaos"
+    ],
+    "standings": [
+      {
+        "rank": 1,
+        "team": "Galaxy Racer India",
+        "points": 289,
+        "kills": 133,
+        "prize": "₹30,00,000"
+      },
+      {
+        "rank": 2,
+        "team": "Blind Esports",
+        "points": 241,
+        "kills": 111,
+        "prize": "₹18,00,000"
+      },
+      {
+        "rank": 3,
+        "team": "Total Gaming Esports",
+        "points": 198,
+        "kills": 93,
+        "prize": "₹10,00,000"
+      },
+      {
+        "rank": 4,
+        "team": "Team Elite",
+        "points": 171,
+        "kills": 81,
+        "prize": "₹7,00,000"
+      },
+      {
+        "rank": 5,
+        "team": "YoloStar Gang",
+        "points": 148,
+        "kills": 70,
+        "prize": "₹5,00,000"
+      }
+    ],
+    "relatedArticles": [
+      "article-galaxy-racer-2022",
+      "article-ffic-record-viewership"
+    ]
+  },
+  {
+    "id": "ffic-2023-s1",
+    "name": "Free Fire India Championship 2023 — Season 1",
+    "shortName": "FFIC 2023 S1",
+    "year": 2023,
+    "startDate": "2023-02-01",
+    "endDate": "2023-07-15",
+    "organizer": "Garena India",
+    "format": "BR League + Playoffs + Grand Finals",
+    "prizePool": "₹90,00,000",
+    "prizePoolUSD": 108000,
+    "teamsParticipated": 28,
+    "champion": "Blind Esports",
+    "runnerUp": "Galaxy Racer India",
+    "mvp": "Raistar",
+    "thirdPlace": "YoloStar Gang",
+    "status": "completed",
+    "banner": "",
+    "description": "FFIC 2023 S1 was the biggest and most competitive Free Fire India Championship to date. Blind Esports delivered a commanding performance all season, with Raistar winning his second MVP award. The grand finals drew over 2 million concurrent viewers online.",
+    "historicalSignificance": "First FFIC to exceed ₹90L prize pool. Over 2M concurrent viewers for the grand finals.",
+    "participatingTeams": [
+      "blind-esports",
+      "galaxy-racer-india",
+      "yolostar-gang",
+      "total-gaming-esports",
+      "team-elite",
+      "team-chaos"
+    ],
+    "standings": [
+      {
+        "rank": 1,
+        "team": "Blind Esports",
+        "points": 312,
+        "kills": 145,
+        "prize": "₹35,00,000"
+      },
+      {
+        "rank": 2,
+        "team": "Galaxy Racer India",
+        "points": 265,
+        "kills": 122,
+        "prize": "₹20,00,000"
+      },
+      {
+        "rank": 3,
+        "team": "YoloStar Gang",
+        "points": 218,
+        "kills": 101,
+        "prize": "₹12,00,000"
+      },
+      {
+        "rank": 4,
+        "team": "Total Gaming Esports",
+        "points": 184,
+        "kills": 87,
+        "prize": "₹8,00,000"
+      },
+      {
+        "rank": 5,
+        "team": "Team Elite",
+        "points": 158,
+        "kills": 74,
+        "prize": "₹6,00,000"
+      }
+    ],
+    "relatedArticles": [
+      "article-blind-second-title",
+      "article-ffic-2023-record"
+    ]
+  },
+  {
+    "id": "ffic-2024-s1",
+    "name": "Free Fire India Championship 2024 — Season 1",
+    "shortName": "FFIC 2024 S1",
+    "year": 2024,
+    "startDate": "2024-03-01",
+    "endDate": "2024-08-25",
+    "organizer": "Garena India",
+    "format": "BR League + Playoffs + Grand Finals",
+    "prizePool": "₹1,20,00,000",
+    "prizePoolUSD": 144000,
+    "teamsParticipated": 32,
+    "champion": "YoloStar Gang",
+    "runnerUp": "Blind Esports",
+    "mvp": "Lokesh Gamer",
+    "thirdPlace": "Galaxy Racer India",
+    "status": "completed",
+    "banner": "",
+    "description": "FFIC 2024 was a historic event. YoloStar Gang, the perennial challengers, finally broke through to claim the championship title in a stunning comeback finals performance. Lokesh Gamer won MVP in his debut FFIC season. Prize pool crossed ₹1.2 Crore for the first time.",
+    "historicalSignificance": "First ₹1 Crore+ prize pool in Indian Free Fire esports. YoloStar Gang's maiden FFIC title.",
+    "participatingTeams": [
+      "yolostar-gang",
+      "blind-esports",
+      "galaxy-racer-india",
+      "total-gaming-esports",
+      "team-elite",
+      "team-chaos"
+    ],
+    "standings": [
+      {
+        "rank": 1,
+        "team": "YoloStar Gang",
+        "points": 334,
+        "kills": 157,
+        "prize": "₹50,00,000"
+      },
+      {
+        "rank": 2,
+        "team": "Blind Esports",
+        "points": 281,
+        "kills": 131,
+        "prize": "₹28,00,000"
+      },
+      {
+        "rank": 3,
+        "team": "Galaxy Racer India",
+        "points": 234,
+        "kills": 110,
+        "prize": "₹15,00,000"
+      },
+      {
+        "rank": 4,
+        "team": "Total Gaming Esports",
+        "points": 196,
+        "kills": 93,
+        "prize": "₹10,00,000"
+      },
+      {
+        "rank": 5,
+        "team": "Team Elite",
+        "points": 167,
+        "kills": 79,
+        "prize": "₹7,00,000"
+      }
+    ],
+    "relatedArticles": [
+      "article-yolostar-first-title",
+      "article-ffic-2024-milestone"
+    ]
+  }
+]

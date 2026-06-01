@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Teams — Esports Archive</title>
+<link rel="stylesheet" href="assets/css/style.css">
+<style>
+.team-card-full { background:var(--ash); border:1px solid var(--soot); border-radius:var(--radius); padding:1.75rem; display:flex; align-items:center; gap:1.5rem; transition:var(--trans); cursor:pointer; }
+.team-card-full:hover { border-color:rgba(255,74,0,0.4); transform:translateY(-2px); }
+.team-card-full .tc-body-full { flex:1; }
+.team-card-full .tc-name { font-family:'Bebas Neue',sans-serif; font-size:1.5rem; letter-spacing:2px; color:var(--white); margin-bottom:4px; }
+.team-card-full .tc-meta-row { display:flex; flex-wrap:wrap; gap:.5rem 1.5rem; margin-top:.5rem; }
+.team-card-full .tc-meta-item-sm { font-family:'Space Mono',monospace; font-size:10px; color:var(--cinder); }
+.team-card-full .tc-meta-item-sm strong { color:var(--pale); }
+.team-card-full .tc-right { text-align:right; flex-shrink:0; }
+.champ-count { font-family:'Bebas Neue',sans-serif; font-size:3rem; color:var(--gold); letter-spacing:2px; line-height:1; }
+.champ-label { font-family:'Space Mono',monospace; font-size:9px; color:var(--cinder); letter-spacing:1.5px; text-transform:uppercase; }
+</style>
+</head>
+<body>
+<nav></nav>
+<div class="mobile-menu" id="mobileMenu"></div>
+<section class="page-hero">
+  <div class="container">
+    <div class="breadcrumb"><a href="index.html">Home</a><span class="sep">›</span><span class="current">Teams</span></div>
+    <span class="page-hero-tag">// Team Database</span>
+    <h1 class="page-hero-title">TEAMS</h1>
+    <p class="page-hero-desc">Every organization that has competed in Indian Free Fire esports — active rosters, disbanded legends, and everything in between.</p>
+  </div>
+</section>
+<div style="background:var(--smoke);border-bottom:1px solid var(--soot);padding:1rem 0;">
+  <div class="container">
+    <div class="stats-grid" style="border:none;background:transparent;grid-template-columns:repeat(4,1fr);gap:0;">
+      <div class="stat-block" style="border-right:1px solid var(--soot);"><span class="stat-num" id="statTotal">—</span><span class="stat-label">Total Teams</span></div>
+      <div class="stat-block" style="border-right:1px solid var(--soot);"><span class="stat-num" id="statActive">—</span><span class="stat-label">Active</span></div>
+      <div class="stat-block" style="border-right:1px solid var(--soot);"><span class="stat-num" id="statInactive">—</span><span class="stat-label">Inactive</span></div>
+      <div class="stat-block"><span class="stat-num" id="statDisbanded">—</span><span class="stat-label">Disbanded</span></div>
+    </div>
+  </div>
+</div>
+<section class="section-pad">
+  <div class="container">
+    <div style="display:flex;gap:1rem;flex-wrap:wrap;margin-bottom:1.5rem;align-items:center;">
+      <div class="search-bar" style="flex:1;min-width:200px;margin-bottom:0;">
+        <input class="search-input" id="searchInput" type="text" placeholder="Search teams…" oninput="filterTeams()">
+      </div>
+      <div class="filter-bar" style="margin-bottom:0;" id="statusFilters">
+        <button class="filter-btn active" data-status="all" onclick="setFilter(this)">All</button>
+        <button class="filter-btn" data-status="active" onclick="setFilter(this)">Active</button>
+        <button class="filter-btn" data-status="inactive" onclick="setFilter(this)">Inactive</button>
+        <button class="filter-btn" data-status="disbanded" onclick="setFilter(this)">Disbanded</button>
+      </div>
+    </div>
+    <div style="display:flex;gap:8px;margin-bottom:1.5rem;align-items:center;">
+      <span style="font-family:'Space Mono',monospace;font-size:10px;color:var(--cinder);letter-spacing:1px;text-transform:uppercase;margin-right:.5rem;">View:</span>
+      <button class="filter-btn active" id="viewGrid" onclick="setView('grid')">Grid</button>
+      <button class="filter-btn" id="viewList" onclick="setView('list')">List</button>
+    </div>
+    <div id="teamsContainer"></div>
+    <div id="noResults" style="display:none;" class="empty-state"><h3>No Teams Found</h3><p>Try adjusting your filters.</p></div>
+  </div>
+</section>
+<footer></footer>
+<script src="assets/js/app.js"></script>
+<script>
+let allTeams = [];
+let activeStatus = 'all';
+let currentView = 'grid';
+
+document.addEventListener('DOMContentLoaded', async () => {
+  await renderNav('teams');
+  renderFooter();
+  await loadTeams();
+  setTimeout(initFadeIn, 120);
+});
+
+async function loadTeams() {
+  allTeams = await Api.getAll('teams');
+  const active = allTeams.filter(t=>t.status==='active').length;
+  const inactive = allTeams.filter(t=>t.status==='inactive').length;
+  const disbanded = allTeams.filter(t=>t.status==='disbanded').length;
+  document.getElementById('statTotal').textContent = allTeams.length;
+  document.getElementById('statActive').textContent = active;
+  document.getElementById('statInactive').textContent = inactive;
+  document.getElementById('statDisbanded').textContent = disbanded;
+  renderTeams(allTeams);
+}
+
+function setFilter(btn) {
+  document.querySelectorAll('#statusFilters .filter-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  activeStatus = btn.dataset.status;
+  filterTeams();
+}
+function setView(v) {
+  currentView = v;
+  document.getElementById('viewGrid').classList.toggle('active', v==='grid');
+  document.getElementById('viewList').classList.toggle('active', v==='list');
+  filterTeams();
+}
+function filterTeams() {
+  const q = document.getElementById('searchInput').value.toLowerCase();
+  let list = allTeams;
+  if (activeStatus !== 'all') list = list.filter(t=>t.status===activeStatus);
+  if (q) list = list.filter(t=>t.name.toLowerCase().includes(q)||t.region?.toLowerCase().includes(q));
+  renderTeams(list);
+}
+function renderTeams(list) {
+  const container = document.getElementById('teamsContainer');
+  const noR = document.getElementById('noResults');
+  if (!list.length) { container.innerHTML=''; noR.style.display='block'; return; }
+  noR.style.display='none';
+  if (currentView === 'grid') {
+    container.innerHTML = `<div class="teams-grid">${list.map(t=>`
+      <div class="team-card fade-in" onclick="location.href='team-detail.html?id=${t.id}'">
+        ${teamLogoHTMLSync(t, 72)}
+        <div class="team-name">${t.name}</div>
+        <div class="team-region">${t.region||''}</div>
+        <span class="status-badge ${getStatusClass(t.status)}">${t.status}</span>
+        <div class="team-titles">Championships: <strong>${t.championships||0}</strong></div>
+        <div style="margin-top:1rem;"><a class="tc-link" href="team-detail.html?id=${t.id}">View Team →</a></div>
+      </div>`).join('')}</div>`;
+  } else {
+    container.innerHTML = `<div style="display:flex;flex-direction:column;gap:.75rem;">${list.map(t=>`
+      <div class="team-card-full fade-in" onclick="location.href='team-detail.html?id=${t.id}'">
+        ${teamLogoHTMLSync(t, 64)}
+        <div class="tc-body-full">
+          <div class="tc-name">${t.name}</div>
+          <span class="status-badge ${getStatusClass(t.status)}">${t.status}</span>
+          <div class="tc-meta-row">
+            <span class="tc-meta-item-sm">Region: <strong>${t.region||'—'}</strong></span>
+            <span class="tc-meta-item-sm">Founded: <strong>${formatDate(t.founded)}</strong></span>
+            <span class="tc-meta-item-sm">Owner: <strong>${t.owner||'—'}</strong></span>
+          </div>
+        </div>
+        <div class="tc-right">
+          <div class="champ-count">${t.championships||0}</div>
+          <div class="champ-label">Championships</div>
+          <a class="tc-link" href="team-detail.html?id=${t.id}" style="margin-top:.75rem;display:inline-flex;">View →</a>
+        </div>
+      </div>`).join('')}</div>`;
+  }
+  setTimeout(initFadeIn, 50);
+}
+</script>
+</body>
+</html>

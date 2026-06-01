@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Player Profile — Esports Archive</title>
+<link rel="stylesheet" href="assets/css/style.css">
+<style>
+.career-stat-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(110px,1fr)); gap:1px; background:rgba(255,74,0,0.1); border:1px solid rgba(255,74,0,0.1); margin-bottom:1.5rem; }
+.career-stat { background:var(--coal); padding:1.25rem; text-align:center; }
+.cs-num { font-family:'Bebas Neue',sans-serif; font-size:2rem; letter-spacing:2px; color:var(--fire); line-height:1; display:block; }
+.cs-label { font-family:'Space Mono',monospace; font-size:9px; color:var(--cinder); letter-spacing:1.5px; text-transform:uppercase; margin-top:4px; display:block; }
+.career-timeline-item { display:flex; gap:1rem; padding:1rem; border-bottom:1px solid rgba(255,255,255,0.04); }
+.career-timeline-item:last-child { border-bottom:none; }
+.ct-year { font-family:'Bebas Neue',sans-serif; font-size:1.75rem; color:rgba(255,74,0,0.3); letter-spacing:2px; flex-shrink:0; width:56px; }
+.ct-content { flex:1; }
+.ct-event { font-size:14px; font-weight:700; color:var(--white); margin-bottom:2px; }
+.ct-detail { font-size:13px; color:var(--pale); }
+.th-row { display:flex; align-items:center; gap:1rem; padding:.875rem 1rem; border-bottom:1px solid rgba(255,255,255,0.04); }
+.th-row:last-child { border-bottom:none; }
+.th-result-champion { font-family:'Bebas Neue',sans-serif; font-size:.95rem; letter-spacing:1px; color:var(--gold); }
+.th-result { font-family:'Bebas Neue',sans-serif; font-size:.95rem; letter-spacing:1px; color:var(--pale); }
+</style>
+</head>
+<body>
+<nav></nav>
+<div class="mobile-menu" id="mobileMenu"></div>
+
+<section class="page-hero">
+  <div class="container">
+    <div class="breadcrumb">
+      <a href="index.html">Home</a><span class="sep">›</span>
+      <a href="players.html">Players</a><span class="sep">›</span>
+      <span class="current" id="bcName">Loading…</span>
+    </div>
+    <span class="page-hero-tag" id="heroTag">// Player Profile</span>
+    <h1 class="page-hero-title" id="heroTitle">LOADING…</h1>
+  </div>
+</section>
+
+<section class="section-pad">
+  <div class="container" id="mainContent">
+    <div class="loading-state">Loading player profile…</div>
+  </div>
+</section>
+
+<footer></footer>
+<script src="assets/js/app.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', async () => {
+  
+  await renderNav('players');
+  renderFooter();
+  loadPlayer();
+  setTimeout(initFadeIn, 120);
+});
+
+function loadPlayer() {
+  const id = getParam('id');
+  if (!id) { showError('No player ID.'); return; }
+  const player = await Api.getById('players', id);
+  if (!player) { showError('Player not found.'); return; }
+
+  document.getElementById('bcName').textContent = player.ign;
+  document.getElementById('heroTag').textContent = `// ${player.role} · ${player.status.toUpperCase()}`;
+  document.getElementById('heroTitle').textContent = player.ign.toUpperCase();
+  document.title = `${player.ign} — Esports Archive`;
+
+  const allTeams = await Api.getAll('teams');
+  const articles = (await Api.getAll('articles')).filter(a=>a.relatedPlayer===id);
+  const currentTeam = player.currentTeam ? allTeams.find(t=>t.id===player.currentTeam) : null;
+  const formerTeams = (player.formerTeams||[]).map(tid=>allTeams.find(t=>t.id===tid)).filter(Boolean);
+
+  const stats = player.statistics || {};
+  const wins = (player.tournamentHistory||[]).filter(h=>h.result==='Champion').length;
+  const mvps = (player.tournamentHistory||[]).filter(h=>h.award?.includes('MVP')).length;
+
+  const timelineHTML = (player.careerTimeline||[]).map(e=>`
+    <div class="career-timeline-item">
+      <div class="ct-year">${e.year}</div>
+      <div class="ct-content">
+        <div class="ct-event">${e.event}</div>
+        <div class="ct-detail">${e.detail}</div>
+      </div>
+    </div>`).join('') || '<div style="padding:1rem;color:var(--cinder);">No timeline data.</div>';
+
+  const tournHistHTML = (player.tournamentHistory||[]).map(h=>`
+    <div class="th-row">
+      <div style="flex:1;font-size:14px;font-weight:600;color:var(--cream);">${h.tournament}</div>
+      <div style="font-size:13px;color:var(--cinder);">${h.team}</div>
+      <div class="${h.result==='Champion'?'th-result-champion':'th-result'}">${h.result}</div>
+      ${h.award?`<span class="achievement-badge">${h.award}</span>`:''}
+    </div>`).join('') || '<div style="padding:1rem;color:var(--cinder);">No tournament history.</div>';
+
+  const formerTeamsHTML = formerTeams.length
+    ? formerTeams.map(t=>`<div class="roster-player" onclick="location.href='team-detail.html?id=${t.id}'" style="cursor:pointer;">${teamLogoHTMLSync(t,36)}<span style="font-weight:600;color:var(--pale);">${t.name}</span><span class="status-badge ${getStatusClass(t.status)}">${t.status}</span></div>`).join('')
+    : '<div style="padding:1rem;color:var(--cinder);">No former teams.</div>';
+
+  const artHTML = articles.length ? articles.map(a=>`
+    <div class="article-preview" onclick="location.href='article-detail.html?id=${a.id}'">
+      <span class="ap-cat">${a.category}</span>
+      <div class="ap-title">${a.title}</div>
+      <div class="ap-date">${formatDate(a.date)}</div>
+    </div>`).join('') : '';
+
+  document.getElementById('mainContent').innerHTML = `
+    <div class="detail-layout">
+      <!-- SIDEBAR -->
+      <div>
+        <div class="detail-sidebar fade-in">
+          <div class="detail-sidebar-header">
+            ${playerAvatarHTMLSync(player, 96)}
+            <div style="margin-top:1rem;">
+              <div style="font-family:'Bebas Neue',sans-serif;font-size:1.75rem;letter-spacing:2px;color:var(--white);">${player.ign}</div>
+              <div style="font-family:'Space Mono',monospace;font-size:10px;color:var(--cinder);letter-spacing:1px;">${player.realName||''}</div>
+            </div>
+            <div style="margin-top:.75rem;display:flex;gap:.5rem;flex-wrap:wrap;justify-content:center;">
+              <span class="player-role-badge">${player.role}</span>
+              <span class="status-badge ${player.status==='active'?'status-active':'status-disbanded'}">${player.status}</span>
+            </div>
+          </div>
+          <div style="padding:1.25rem;">
+            <div class="info-row"><span class="info-label">Real Name</span><span class="info-value">${player.realName||'—'}</span></div>
+            <div class="info-row"><span class="info-label">Country</span><span class="info-value">${player.country||'India'}</span></div>
+            <div class="info-row"><span class="info-label">Region</span><span class="info-value">${player.region||'—'}</span></div>
+            <div class="info-row"><span class="info-label">Career Start</span><span class="info-value">${formatDate(player.careerStart)}</span></div>
+            <div class="info-row"><span class="info-label">Current Team</span>
+              <span class="info-value">${currentTeam?`<a href="team-detail.html?id=${currentTeam.id}" style="color:var(--fire);">${currentTeam.name}</a>`:player.currentTeam||'Free Agent'}</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="info-block fade-in" style="margin-top:1.5rem;">
+          <div class="info-block-title">Career Highlights</div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:1px;background:rgba(255,74,0,0.1);border:1px solid rgba(255,74,0,0.1);">
+            <div style="background:var(--coal);padding:1rem;text-align:center;">
+              <div style="font-family:'Bebas Neue',sans-serif;font-size:2rem;color:var(--gold);letter-spacing:2px;">${wins}</div>
+              <div style="font-family:'Space Mono',monospace;font-size:8px;color:var(--cinder);text-transform:uppercase;letter-spacing:1px;">Titles</div>
+            </div>
+            <div style="background:var(--coal);padding:1rem;text-align:center;">
+              <div style="font-family:'Bebas Neue',sans-serif;font-size:2rem;color:var(--ember);letter-spacing:2px;">${mvps}</div>
+              <div style="font-family:'Space Mono',monospace;font-size:8px;color:var(--cinder);text-transform:uppercase;letter-spacing:1px;">MVPs</div>
+            </div>
+            <div style="background:var(--coal);padding:1rem;text-align:center;">
+              <div style="font-family:'Bebas Neue',sans-serif;font-size:2rem;color:var(--fire);letter-spacing:2px;">${stats.tournamentsPlayed||0}</div>
+              <div style="font-family:'Space Mono',monospace;font-size:8px;color:var(--cinder);text-transform:uppercase;letter-spacing:1px;">Tourneys</div>
+            </div>
+            <div style="background:var(--coal);padding:1rem;text-align:center;">
+              <div style="font-family:'Bebas Neue',sans-serif;font-size:2rem;color:var(--white);letter-spacing:2px;">${stats.avgKillsPerGame||'—'}</div>
+              <div style="font-family:'Space Mono',monospace;font-size:8px;color:var(--cinder);text-transform:uppercase;letter-spacing:1px;">Avg Kills</div>
+            </div>
+          </div>
+          ${stats.totalPrizeMoney?`<div style="text-align:center;padding:1rem;background:var(--coal);border:1px solid rgba(255,194,0,0.1);margin-top:1px;"><div style="font-family:'Bebas Neue',sans-serif;font-size:1.5rem;color:var(--gold);letter-spacing:2px;">${stats.totalPrizeMoney}</div><div style="font-family:'Space Mono',monospace;font-size:9px;color:var(--cinder);text-transform:uppercase;letter-spacing:1px;">Total Prize Earnings</div></div>`:''}
+        </div>
+
+        <div class="info-block fade-in" style="margin-top:1.5rem;">
+          <div class="info-block-title">Achievements</div>
+          <div class="achievement-list">
+            ${(player.achievements||[]).map(a=>`<span class="achievement-badge">${a}</span>`).join('')||'<span style="color:var(--cinder);font-size:13px;">None recorded.</span>'}
+          </div>
+        </div>
+      </div>
+
+      <!-- MAIN -->
+      <div class="detail-main">
+        <div class="info-block fade-in">
+          <div class="info-block-title">Player Bio</div>
+          <div style="font-size:15px;color:var(--pale);line-height:1.8;">${player.bio||'No bio available.'}</div>
+        </div>
+
+        <div class="info-block fade-in">
+          <div class="info-block-title">Career Timeline</div>
+          ${timelineHTML}
+        </div>
+
+        <div class="info-block fade-in">
+          <div class="info-block-title">Tournament History</div>
+          ${tournHistHTML}
+        </div>
+
+        <div class="info-block fade-in">
+          <div class="info-block-title">Former Teams</div>
+          ${formerTeamsHTML}
+        </div>
+
+        ${artHTML?`<div class="info-block fade-in"><div class="info-block-title">Related Articles</div><div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:1rem;">${artHTML}</div></div>`:''}
+      </div>
+    </div>`;
+  setTimeout(initFadeIn, 80);
+}
+
+function showError(msg) {
+  document.getElementById('heroTitle').textContent = 'NOT FOUND';
+  document.getElementById('mainContent').innerHTML = `<div class="empty-state"><h3>${msg}</h3><a href="players.html" class="btn-outline" style="margin-top:1rem;">← Back to Players</a></div>`;
+}
+</script>
+</body>
+</html>

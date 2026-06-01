@@ -1,0 +1,54 @@
+[
+  {
+    "id": "upcoming-ffic-2025-s1",
+    "name": "Free Fire India Championship 2025 \u2014 Season 1",
+    "date": "2025-08-18",
+    "endDate": "2026-01-30",
+    "organizer": "Garena India",
+    "format": "BR League + Playoffs + Grand Finals",
+    "prizePool": "\u20b91,50,00,000",
+    "teamsSlots": 36,
+    "registrationStatus": "open",
+    "description": "The most anticipated FFIC season yet, with a record \u20b91.5 Crore prize pool and 36 team slots. The format includes an expanded league stage, new playoff bracket system, and offline grand finals.",
+    "location": "Online League + Offline Grand Finals (Mumbai)"
+  },
+  {
+    "id": "upcoming-ffic-north-qualifier",
+    "name": "FFIC Showdown Qualifier \u2014 North India",
+    "date": "2025-10-05",
+    "endDate": "2025-10-07",
+    "organizer": "Garena India",
+    "format": "Online Qualifier",
+    "prizePool": "TBA",
+    "teamsSlots": null,
+    "registrationStatus": "announced",
+    "description": "Open qualifier tournament for North Indian teams to secure a spot in the FFIC 2025 showdown. All skill levels welcome.",
+    "location": "Online"
+  },
+  {
+    "id": "upcoming-ffic-2025-winter",
+    "name": "FFIC Winter Championship 2025",
+    "date": "2025-12-20",
+    "endDate": "2026-01-15",
+    "organizer": "Garena India",
+    "format": "BR League",
+    "prizePool": "\u20b940,00,000",
+    "teamsSlots": 20,
+    "registrationStatus": "announced",
+    "description": "End-of-year championship to crown the winter season champion. Features 20 invited teams and a \u20b940L prize pool.",
+    "location": "Online"
+  },
+  {
+    "id": "upcoming-community-invitational",
+    "name": "Community Creator Invitational 2025",
+    "date": "2026-02-14",
+    "endDate": "2026-02-16",
+    "organizer": "Third-Party",
+    "format": "Exhibition + Competitive",
+    "prizePool": "\u20b910,00,000",
+    "teamsSlots": 16,
+    "registrationStatus": "tba",
+    "description": "A hybrid tournament featuring top competitive teams and popular content creators in a unique exhibition format. Exact details to be announced.",
+    "location": "Delhi, India"
+  }
+]

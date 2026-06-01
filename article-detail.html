@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Article — Esports Archive</title>
+<link rel="stylesheet" href="assets/css/style.css">
+<style>
+.article-body { max-width:720px; }
+.article-body p { font-size:16px; color:var(--pale); line-height:1.9; margin-bottom:1.5rem; }
+.article-meta-bar {
+  display:flex; align-items:center; gap:1.5rem; flex-wrap:wrap;
+  padding:1rem 0; border-top:1px solid var(--soot); border-bottom:1px solid var(--soot);
+  margin-bottom:2rem; font-family:'Space Mono',monospace; font-size:10px; color:var(--cinder); letter-spacing:1px;
+}
+.article-meta-bar span strong { color:var(--pale); }
+.article-content-block {
+  background:var(--ash); border:1px solid var(--soot);
+  border-left:4px solid var(--fire); border-radius:var(--radius);
+  padding:2rem; font-size:16px; color:var(--pale); line-height:1.9;
+  margin-bottom:2rem;
+}
+.related-block { background:var(--smoke); border:1px solid var(--soot); border-radius:var(--radius); padding:1.5rem; }
+</style>
+</head>
+<body>
+<nav></nav>
+<div class="mobile-menu" id="mobileMenu"></div>
+
+<section class="page-hero">
+  <div class="container">
+    <div class="breadcrumb">
+      <a href="index.html">Home</a><span class="sep">›</span>
+      <a href="articles.html">Articles</a><span class="sep">›</span>
+      <span class="current" id="bcName">Loading…</span>
+    </div>
+    <span class="page-hero-tag" id="heroTag">// Article</span>
+    <h1 class="page-hero-title" id="heroTitle" style="font-size:clamp(2rem,5vw,4.5rem);">LOADING…</h1>
+  </div>
+</section>
+
+<section class="section-pad">
+  <div class="container">
+    <div style="display:grid;grid-template-columns:1fr 300px;gap:2rem;align-items:start;" id="mainContent">
+      <div class="loading-state">Loading article…</div>
+    </div>
+  </div>
+</section>
+
+<footer></footer>
+<script src="assets/js/app.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', async () => {
+  
+  await renderNav('articles');
+  renderFooter();
+  loadArticle();
+  setTimeout(initFadeIn, 120);
+});
+
+function loadArticle() {
+  const id = getParam('id');
+  if (!id) { showError('No article ID.'); return; }
+  const article = await Api.getById('articles', id);
+  if (!article) { showError('Article not found.'); return; }
+
+  document.getElementById('bcName').textContent = article.category;
+  document.getElementById('heroTag').textContent = `// ${article.category}`;
+  document.getElementById('heroTitle').textContent = article.title.toUpperCase();
+  document.title = `${article.title} — Esports Archive`;
+
+  const allTeams = await Api.getAll('teams');
+  const allPlayers = await Api.getAll('players');
+  const allTournaments = await Api.getAll('tournaments');
+
+  const relatedTeam = article.relatedTeam ? allTeams.find(t=>t.id===article.relatedTeam) : null;
+  const relatedPlayer = article.relatedPlayer ? allPlayers.find(p=>p.id===article.relatedPlayer) : null;
+  const relatedTournament = article.relatedTournament ? allTournaments.find(t=>t.id===article.relatedTournament) : null;
+
+  // Related articles
+  const related = (await Api.getAll('articles')).filter(a=>a.id!==id&&a.category===article.category).slice(0,3);
+
+  document.getElementById('mainContent').innerHTML = `
+    <!-- ARTICLE BODY -->
+    <div class="article-body fade-in">
+      <div class="article-meta-bar">
+        <span>Category: <strong>${article.category}</strong></span>
+        <span>Date: <strong>${formatDate(article.date)}</strong></span>
+        <span>Author: <strong>${article.author}</strong></span>
+        ${article.featured?'<span style="color:var(--gold);">★ Featured Article</span>':''}
+      </div>
+
+      <div style="font-size:18px;color:var(--cream);line-height:1.7;margin-bottom:2rem;font-weight:500;border-left:3px solid var(--fire);padding-left:1.25rem;">${article.summary}</div>
+
+      <div class="article-content-block">
+        ${(article.content||'Full article content not available.').split('\n').filter(Boolean).map(p=>`<p>${p}</p>`).join('')}
+      </div>
+
+      ${related.length?`
+      <div class="related-block fade-in">
+        <div style="font-family:'Space Mono',monospace;font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--cinder);margin-bottom:1rem;">Related Articles</div>
+        <div style="display:flex;flex-direction:column;gap:.75rem;">
+          ${related.map(a=>`
+            <div class="roster-card" style="cursor:pointer;flex-direction:column;align-items:flex-start;gap:.25rem;" onclick="location.href='article-detail.html?id=${a.id}'">
+              <span style="font-family:'Space Mono',monospace;font-size:9px;color:var(--fire);letter-spacing:1px;text-transform:uppercase;">${a.category}</span>
+              <span style="font-weight:700;color:var(--cream);">${a.title}</span>
+              <span style="font-family:'Space Mono',monospace;font-size:10px;color:var(--cinder);">${formatDate(a.date)}</span>
+            </div>`).join('')}
+        </div>
+      </div>`:'' }
+    </div>
+
+    <!-- SIDEBAR -->
+    <div>
+      ${relatedTournament?`
+      <div class="info-block fade-in" style="margin-bottom:1.5rem;">
+        <div class="info-block-title">Tournament</div>
+        <div class="roster-card" style="cursor:pointer;" onclick="location.href='tournament-detail.html?id=${relatedTournament.id}'">
+          <div style="flex:1;">
+            <div style="font-weight:700;color:var(--cream);font-size:14px;">${relatedTournament.name}</div>
+            <div style="font-family:'Space Mono',monospace;font-size:10px;color:var(--cinder);">${relatedTournament.year} · ${relatedTournament.organizer}</div>
+          </div>
+          <span style="color:var(--fire);">→</span>
+        </div>
+      </div>`:''}
+
+      ${relatedTeam?`
+      <div class="info-block fade-in" style="margin-bottom:1.5rem;">
+        <div class="info-block-title">Featured Team</div>
+        <div class="roster-card" style="cursor:pointer;" onclick="location.href='team-detail.html?id=${relatedTeam.id}'">
+          ${teamLogoHTML(relatedTeam,36)}
+          <div style="flex:1;">
+            <div style="font-weight:700;color:var(--cream);font-size:14px;">${relatedTeam.name}</div>
+            <span class="status-badge ${getStatusClass(relatedTeam.status)}">${relatedTeam.status}</span>
+          </div>
+          <span style="color:var(--fire);">→</span>
+        </div>
+      </div>`:''}
+
+      ${relatedPlayer?`
+      <div class="info-block fade-in" style="margin-bottom:1.5rem;">
+        <div class="info-block-title">Featured Player</div>
+        <div class="roster-card" style="cursor:pointer;" onclick="location.href='player-detail.html?id=${relatedPlayer.id}'">
+          ${playerAvatarHTML(relatedPlayer,40)}
+          <div style="flex:1;">
+            <div style="font-family:'Bebas Neue',sans-serif;font-size:1.1rem;letter-spacing:1.5px;color:var(--white);">${relatedPlayer.ign}</div>
+            <div style="font-family:'Space Mono',monospace;font-size:10px;color:var(--cinder);">${relatedPlayer.role}</div>
+          </div>
+          <span style="color:var(--fire);">→</span>
+        </div>
+      </div>`:''}
+
+      <div class="info-block fade-in">
+        <div class="info-block-title">Browse More</div>
+        <div style="display:flex;flex-direction:column;gap:.5rem;">
+          <a href="articles.html" class="btn-outline" style="justify-content:center;">All Articles</a>
+          <a href="tournaments.html" class="btn-outline" style="justify-content:center;">Tournaments</a>
+          <a href="timeline.html" class="btn-outline" style="justify-content:center;">Timeline</a>
+        </div>
+      </div>
+    </div>`;
+
+  setTimeout(initFadeIn, 80);
+}
+
+function showError(msg) {
+  document.getElementById('heroTitle').textContent = 'NOT FOUND';
+  document.getElementById('mainContent').innerHTML = `<div class="empty-state"><h3>${msg}</h3><a href="articles.html" class="btn-outline" style="margin-top:1rem;">← Back to Articles</a></div>`;
+}
+</script>
+</body>
+</html>

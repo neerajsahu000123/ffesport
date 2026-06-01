@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tournaments — Esports Archive</title>
+<link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body>
+<nav></nav>
+<div class="mobile-menu" id="mobileMenu"></div>
+
+<!-- PAGE HERO -->
+<section class="page-hero">
+  <div class="container">
+    <div class="breadcrumb"><a href="index.html">Home</a><span class="sep">›</span><span class="current">Tournaments</span></div>
+    <span class="page-hero-tag">// Tournament Database</span>
+    <h1 class="page-hero-title">TOURNAMENTS</h1>
+    <p class="page-hero-desc">Complete record of every major Free Fire India tournament from 2019 to present. Standings, prize pools, champions, and historical context.</p>
+  </div>
+</section>
+
+<!-- STATS BAR -->
+<div style="background:var(--smoke);border-bottom:1px solid var(--soot);padding:1rem 0;">
+  <div class="container">
+    <div class="stats-grid" style="border:none;background:transparent;grid-template-columns:repeat(4,1fr);gap:0;" id="tourneyStats">
+      <div class="stat-block" style="border-right:1px solid var(--soot);"><span class="stat-num" id="statTourneys">0</span><span class="stat-label">Tournaments</span></div>
+      <div class="stat-block" style="border-right:1px solid var(--soot);"><span class="stat-num" id="statChampions">0</span><span class="stat-label">Unique Champions</span></div>
+      <div class="stat-block" style="border-right:1px solid var(--soot);"><span class="stat-num" id="statYears">6</span><span class="stat-label">Years of History</span></div>
+      <div class="stat-block"><span class="stat-num">₹4.7Cr+</span><span class="stat-label">Total Prize Money</span></div>
+    </div>
+  </div>
+</div>
+
+<!-- MAIN CONTENT -->
+<section class="section-pad">
+  <div class="container">
+    <!-- CONTROLS -->
+    <div style="display:flex;align-items:center;gap:1rem;flex-wrap:wrap;margin-bottom:2rem;">
+      <div class="search-bar" style="flex:1;min-width:220px;margin-bottom:0;">
+        <input class="search-input" id="searchInput" type="text" placeholder="Search tournaments…" oninput="filterTournaments()">
+      </div>
+    </div>
+    <div class="filter-bar" id="yearFilters">
+      <button class="filter-btn active" data-year="all" onclick="setYearFilter(this)">All Years</button>
+    </div>
+    <div class="filter-bar" id="orgFilters" style="margin-top:-1rem;">
+      <button class="filter-btn active" data-org="all" onclick="setOrgFilter(this)">All Organizers</button>
+    </div>
+
+    <!-- GRID -->
+    <div class="tournaments-grid" id="tournamentsGrid">
+      <div class="loading-state">Loading tournaments…</div>
+    </div>
+    <div id="noResults" style="display:none;" class="empty-state">
+      <h3>No Results</h3>
+      <p>Try adjusting your search or filters.</p>
+    </div>
+  </div>
+</section>
+
+<footer></footer>
+<script src="assets/js/app.js"></script>
+<script>
+let allTournaments = [];
+let activeYear = 'all';
+let activeOrg = 'all';
+
+document.addEventListener('DOMContentLoaded', async () => {
+  await renderNav('tournaments');
+  renderFooter();
+  await loadTournaments();
+  setTimeout(initFadeIn, 120);
+});
+
+async function loadTournaments() {
+  allTournaments = (await Api.getAll('tournaments')).sort((a,b) => b.year - a.year);
+
+  // Build year filters
+  const years = [...new Set(allTournaments.map(t => t.year))].sort((a,b)=>b-a);
+  const yearFilters = document.getElementById('yearFilters');
+  years.forEach(y => {
+    const btn = document.createElement('button');
+    btn.className = 'filter-btn';
+    btn.dataset.year = y;
+    btn.textContent = y;
+    btn.onclick = function(){ setYearFilter(this); };
+    yearFilters.appendChild(btn);
+  });
+
+  // Build organizer filters
+  const orgs = [...new Set(allTournaments.map(t => t.organizer))];
+  const orgFilters = document.getElementById('orgFilters');
+  orgs.forEach(o => {
+    const btn = document.createElement('button');
+    btn.className = 'filter-btn';
+    btn.dataset.org = o;
+    btn.textContent = o;
+    btn.onclick = function(){ setOrgFilter(this); };
+    orgFilters.appendChild(btn);
+  });
+
+  // Stats
+  const champions = new Set(allTournaments.map(t=>t.champion));
+  document.getElementById('statTourneys').textContent = allTournaments.length;
+  document.getElementById('statChampions').textContent = champions.size;
+
+  renderTournamentCards(allTournaments);
+}
+
+function setYearFilter(btn) {
+  document.querySelectorAll('#yearFilters .filter-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  activeYear = btn.dataset.year;
+  filterTournaments();
+}
+function setOrgFilter(btn) {
+  document.querySelectorAll('#orgFilters .filter-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  activeOrg = btn.dataset.org;
+  filterTournaments();
+}
+
+function filterTournaments() {
+  const q = document.getElementById('searchInput').value.toLowerCase();
+  let list = allTournaments;
+  if (activeYear !== 'all') list = list.filter(t => t.year == activeYear);
+  if (activeOrg !== 'all') list = list.filter(t => t.organizer === activeOrg);
+  if (q) list = list.filter(t =>
+    t.name.toLowerCase().includes(q) ||
+    t.champion?.toLowerCase().includes(q) ||
+    t.organizer.toLowerCase().includes(q)
+  );
+  renderTournamentCards(list);
+}
+
+function renderTournamentCards(list) {
+  const grid = document.getElementById('tournamentsGrid');
+  const noR = document.getElementById('noResults');
+  if (!list.length) { grid.innerHTML=''; noR.style.display='block'; return; }
+  noR.style.display='none';
+  grid.innerHTML = list.map(t => `
+    <div class="tournament-card fade-in" onclick="location.href='tournament-detail.html?id=${t.id}'">
+      <div class="tc-header">
+        <div class="tc-info">
+          <h3>${t.name}</h3>
+          <div class="tc-org">${t.organizer} · ${t.format}</div>
+        </div>
+        <div class="tc-year">${t.year}</div>
+      </div>
+      <div class="tc-body">
+        <div class="tc-meta">
+          <div class="tc-meta-item"><label>Prize Pool</label><span class="tc-prize">${t.prizePool}</span></div>
+          <div class="tc-meta-item"><label>Teams</label><span>${t.teamsParticipated}</span></div>
+          <div class="tc-meta-item"><label>Dates</label><span>${formatDate(t.startDate)} – ${formatDate(t.endDate)}</span></div>
+          <div class="tc-meta-item"><label>MVP</label><span>${t.mvp||'—'}</span></div>
+        </div>
+        <div class="tc-champion">
+          <div class="tc-champion-crown">🏆</div>
+          <div><label class="tc-org">Champion</label><span class="tc-champion" style="font-family:'Bebas Neue',sans-serif;font-size:1.1rem;letter-spacing:2px;color:var(--gold);display:block;">${t.champion}</span></div>
+          <div style="margin-left:auto;text-align:right;"><label class="tc-org">Runner-Up</label><span style="font-size:13px;font-weight:600;color:var(--pale);display:block;">${t.runnerUp||'—'}</span></div>
+        </div>
+      </div>
+      <div class="tc-footer">
+        <span class="tc-teams-badge">${t.teamsParticipated} TEAMS · ${t.year}</span>
+        <a class="tc-link" href="tournament-detail.html?id=${t.id}">View Details →</a>
+      </div>
+    </div>`).join('');
+  setTimeout(initFadeIn, 50);
+}
+</script>
+</body>
+</html>

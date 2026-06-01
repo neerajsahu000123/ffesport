@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tournament Detail — Esports Archive</title>
+<link rel="stylesheet" href="assets/css/style.css">
+<style>
+.podium { display:grid; grid-template-columns:repeat(3,1fr); gap:1rem; margin-bottom:2rem; }
+.podium-card { background:var(--ash); border:1px solid var(--soot); border-radius:var(--radius); padding:1.5rem; text-align:center; }
+.podium-card.p1 { border-top:3px solid var(--gold); }
+.podium-card.p2 { border-top:3px solid var(--pale); }
+.podium-card.p3 { border-top:3px solid var(--ember); }
+.podium-num { font-family:'Bebas Neue',sans-serif; font-size:3rem; line-height:1; color:rgba(255,255,255,0.1); letter-spacing:2px; }
+.podium-label { font-family:'Space Mono',monospace; font-size:9px; letter-spacing:2px; text-transform:uppercase; color:var(--cinder); margin-bottom:.5rem; }
+.podium-team { font-family:'Bebas Neue',sans-serif; font-size:1.3rem; letter-spacing:2px; color:var(--white); }
+.podium-prize { font-size:13px; color:var(--gold); font-weight:600; margin-top:.25rem; }
+.desc-block { background:var(--ash); border:1px solid var(--soot); border-left:3px solid var(--fire); border-radius:var(--radius); padding:1.5rem 2rem; font-size:15px; color:var(--pale); line-height:1.8; margin-bottom:1.5rem; }
+.sig-block { background:rgba(255,194,0,0.05); border:1px solid rgba(255,194,0,0.15); border-radius:var(--radius); padding:1.25rem 1.5rem; display:flex; gap:1rem; align-items:flex-start; }
+.sig-icon { font-size:1.5rem; flex-shrink:0; }
+.sig-text { font-size:14px; color:var(--pale); line-height:1.6; }
+.sig-text strong { color:var(--gold); }
+.related-articles-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(260px,1fr)); gap:1rem; }
+</style>
+</head>
+<body>
+<nav></nav>
+<div class="mobile-menu" id="mobileMenu"></div>
+
+<!-- HERO (dynamic) -->
+<section class="page-hero" id="tourneyHero">
+  <div class="container">
+    <div class="breadcrumb">
+      <a href="index.html">Home</a><span class="sep">›</span>
+      <a href="tournaments.html">Tournaments</a><span class="sep">›</span>
+      <span class="current" id="breadcrumbName">Loading…</span>
+    </div>
+    <span class="page-hero-tag" id="heroTag">// Tournament</span>
+    <h1 class="page-hero-title" id="heroTitle">LOADING…</h1>
+    <p class="page-hero-desc" id="heroDesc"></p>
+  </div>
+</section>
+
+<!-- CONTENT -->
+<section class="section-pad">
+  <div class="container" id="mainContent">
+    <div class="loading-state">Loading tournament details…</div>
+  </div>
+</section>
+
+<footer></footer>
+<script src="assets/js/app.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', async () => {
+  
+  await renderNav('tournaments');
+  renderFooter();
+  loadTournament();
+  setTimeout(initFadeIn, 120);
+});
+
+function loadTournament() {
+  const id = getParam('id');
+  if (!id) { showError('No tournament ID specified.'); return; }
+  const t = await Api.getById('tournaments', id);
+  if (!t) { showError('Tournament not found.'); return; }
+
+  // Update hero
+  document.getElementById('breadcrumbName').textContent = t.shortName || t.name;
+  document.getElementById('heroTag').textContent = `// ${t.year} · ${t.organizer}`;
+  document.getElementById('heroTitle').textContent = t.name.toUpperCase();
+  document.getElementById('heroDesc').textContent = `${t.format} · ${t.teamsParticipated} Teams · ${t.prizePool} Prize Pool`;
+  document.title = `${t.name} — Esports Archive`;
+
+  // Load related articles
+  const articles = (await Api.getAll('articles')).filter(a => a.relatedTournament === id);
+  const teams = await Api.getAll('teams');
+
+  document.getElementById('mainContent').innerHTML = buildContent(t, articles, teams);
+  setTimeout(initFadeIn, 80);
+}
+
+function buildContent(t, articles, allTeams) {
+  // standings table
+  const standingsHTML = t.standings?.length ? `
+    <div class="info-block fade-in">
+      <div class="info-block-title">Final Standings</div>
+      <div class="table-wrap">
+        <table class="data-table">
+          <thead><tr>
+            <th>#</th><th>Team</th><th>Points</th><th>Kills</th><th>Prize</th>
+          </tr></thead>
+          <tbody>${t.standings.map(s=>`
+            <tr>
+              <td><span class="rank-num ${s.rank<=3?'rank-'+s.rank:''}">${s.rank===1?'🏆':s.rank===2?'🥈':s.rank===3?'🥉':s.rank}</span></td>
+              <td style="font-weight:700;color:${s.rank===1?'var(--gold)':s.rank===2?'var(--white)':'var(--pale)'};">${s.team}</td>
+              <td style="font-family:'Bebas Neue',sans-serif;font-size:1.1rem;letter-spacing:1px;">${s.points}</td>
+              <td style="color:var(--fire);">${s.kills}</td>
+              <td class="prize-text">${s.prize||'—'}</td>
+            </tr>`).join('')}
+          </tbody>
+        </table>
+      </div>
+    </div>` : '';
+
+  // Participating teams
+  const partTeams = t.participatingTeams?.length
+    ? t.participatingTeams.map(tid => {
+        const team = allTeams.find(tm=>tm.id===tid);
+        return team ? `<div class="roster-card" style="cursor:pointer;" onclick="location.href='team-detail.html?id=${tid}'">${teamLogoHTMLSync(team,36)}<span style="font-weight:600;color:var(--cream);">${team.name}</span><span class="status-badge ${getStatusClass(team.status)}">${team.status}</span></div>` : '';
+      }).join('') : '<div class="loading-state">Team data not available.</div>';
+
+  // Related articles
+  const artHTML = articles.length ? `
+    <div class="info-block fade-in">
+      <div class="info-block-title">Related Articles</div>
+      <div class="related-articles-grid">
+        ${articles.map(a=>`
+          <div class="article-preview" onclick="location.href='article-detail.html?id=${a.id}'">
+            <span class="ap-cat">${a.category}</span>
+            <div class="ap-title">${a.title}</div>
+            <div class="ap-date">${formatDate(a.date)}</div>
+          </div>`).join('')}
+      </div>
+    </div>` : '';
+
+  // Podium
+  const p2 = t.standings?.[1];
+  const p3 = t.standings?.[2];
+
+  return `
+    <div class="detail-layout">
+      <!-- SIDEBAR -->
+      <div>
+        <div class="detail-sidebar fade-in">
+          <div class="detail-sidebar-header">
+            <div style="font-family:'Space Mono',monospace;font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--cinder);margin-bottom:.5rem;">TOURNAMENT INFO</div>
+            <div style="font-family:'Bebas Neue',sans-serif;font-size:4rem;color:rgba(255,74,0,0.2);letter-spacing:3px;line-height:1;">${t.year}</div>
+          </div>
+          <div style="padding:1.25rem;">
+            <div class="info-row"><span class="info-label">Organizer</span><span class="info-value">${t.organizer}</span></div>
+            <div class="info-row"><span class="info-label">Format</span><span class="info-value">${t.format}</span></div>
+            <div class="info-row"><span class="info-label">Start Date</span><span class="info-value">${formatDate(t.startDate)}</span></div>
+            <div class="info-row"><span class="info-label">End Date</span><span class="info-value">${formatDate(t.endDate)}</span></div>
+            <div class="info-row"><span class="info-label">Teams</span><span class="info-value">${t.teamsParticipated}</span></div>
+            <div class="info-row"><span class="info-label">Prize Pool</span><span class="info-value" style="color:var(--gold);">${t.prizePool}</span></div>
+          </div>
+        </div>
+        <div class="info-block fade-in" style="margin-top:1.5rem;">
+          <div class="info-block-title">Results</div>
+          <div class="info-row"><span class="info-label">🏆 Champion</span><span class="info-value" style="color:var(--gold);">${t.champion}</span></div>
+          <div class="info-row"><span class="info-label">🥈 Runner-Up</span><span class="info-value">${t.runnerUp||'—'}</span></div>
+          <div class="info-row"><span class="info-label">🥉 3rd Place</span><span class="info-value">${t.thirdPlace||'—'}</span></div>
+          <div class="info-row"><span class="info-label">⭐ MVP</span><span class="info-value" style="color:var(--ember);">${t.mvp||'—'}</span></div>
+        </div>
+      </div>
+
+      <!-- MAIN -->
+      <div class="detail-main">
+        <!-- Description -->
+        <div class="info-block fade-in">
+          <div class="info-block-title">About This Tournament</div>
+          <div class="desc-block">${t.description||'No description available.'}</div>
+          ${t.historicalSignificance ? `<div class="sig-block"><div class="sig-icon">📜</div><div class="sig-text"><strong>Historical Significance:</strong> ${t.historicalSignificance}</div></div>` : ''}
+        </div>
+
+        <!-- Podium -->
+        <div class="info-block fade-in">
+          <div class="info-block-title">Tournament Podium</div>
+          <div class="podium">
+            <div class="podium-card p1">
+              <div class="podium-num">1</div>
+              <div class="podium-label">Champion</div>
+              <div class="podium-team" style="color:var(--gold);">${t.champion}</div>
+              <div class="podium-prize">${t.standings?.[0]?.prize||''}</div>
+            </div>
+            <div class="podium-card p2">
+              <div class="podium-num">2</div>
+              <div class="podium-label">Runner-Up</div>
+              <div class="podium-team">${t.runnerUp||'—'}</div>
+              <div class="podium-prize">${p2?.prize||''}</div>
+            </div>
+            <div class="podium-card p3">
+              <div class="podium-num">3</div>
+              <div class="podium-label">3rd Place</div>
+              <div class="podium-team" style="color:var(--ember);">${t.thirdPlace||'—'}</div>
+              <div class="podium-prize">${p3?.prize||''}</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Standings -->
+        ${standingsHTML}
+
+        <!-- Participating Teams -->
+        <div class="info-block fade-in">
+          <div class="info-block-title">Participating Teams</div>
+          ${partTeams}
+        </div>
+
+        <!-- Related Articles -->
+        ${artHTML}
+      </div>
+    </div>`;
+}
+
+function showError(msg) {
+  document.getElementById('heroTitle').textContent = 'NOT FOUND';
+  document.getElementById('mainContent').innerHTML = `<div class="empty-state"><h3>${msg}</h3><a href="tournaments.html" class="btn-outline" style="margin-top:1rem;">← Back to Tournaments</a></div>`;
+}
+</script>
+</body>
+</html>

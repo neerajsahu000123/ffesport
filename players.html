@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Players — Esports Archive</title>
+<link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body>
+<nav></nav>
+<div class="mobile-menu" id="mobileMenu"></div>
+
+<section class="page-hero">
+  <div class="container">
+    <div class="breadcrumb"><a href="index.html">Home</a><span class="sep">›</span><span class="current">Players</span></div>
+    <span class="page-hero-tag">// Player Database</span>
+    <h1 class="page-hero-title">PLAYERS</h1>
+    <p class="page-hero-desc">Profiles for every notable player in Indian Free Fire competitive history — career stats, tournament records, and career timelines.</p>
+  </div>
+</section>
+
+<div style="background:var(--smoke);border-bottom:1px solid var(--soot);padding:1rem 0;">
+  <div class="container">
+    <div class="stats-grid" style="border:none;background:transparent;grid-template-columns:repeat(4,1fr);gap:0;">
+      <div class="stat-block" style="border-right:1px solid var(--soot);"><span class="stat-num" id="statTotal">0</span><span class="stat-label">Players</span></div>
+      <div class="stat-block" style="border-right:1px solid var(--soot);"><span class="stat-num" id="statActive">0</span><span class="stat-label">Active</span></div>
+      <div class="stat-block" style="border-right:1px solid var(--soot);"><span class="stat-num" id="statMVPs">0</span><span class="stat-label">MVP Awards</span></div>
+      <div class="stat-block"><span class="stat-num" id="statChamps">0</span><span class="stat-label">Champions</span></div>
+    </div>
+  </div>
+</div>
+
+<section class="section-pad">
+  <div class="container">
+    <div style="display:flex;gap:1rem;flex-wrap:wrap;margin-bottom:1.5rem;align-items:center;">
+      <div class="search-bar" style="flex:1;min-width:200px;margin-bottom:0;">
+        <input class="search-input" id="searchInput" type="text" placeholder="Search by IGN or real name…" oninput="filterPlayers()">
+      </div>
+    </div>
+
+    <div style="display:flex;gap:1rem;flex-wrap:wrap;margin-bottom:2rem;align-items:center;">
+      <div class="filter-bar" style="margin-bottom:0;" id="statusFilters">
+        <button class="filter-btn active" data-status="all" onclick="setStatusFilter(this)">All</button>
+        <button class="filter-btn" data-status="active" onclick="setStatusFilter(this)">Active</button>
+        <button class="filter-btn" data-status="retired" onclick="setStatusFilter(this)">Retired</button>
+      </div>
+      <div class="filter-bar" style="margin-bottom:0;" id="roleFilters">
+        <button class="filter-btn active" data-role="all" onclick="setRoleFilter(this)">All Roles</button>
+        <button class="filter-btn" data-role="IGL" onclick="setRoleFilter(this)">IGL</button>
+        <button class="filter-btn" data-role="Fragger" onclick="setRoleFilter(this)">Fragger</button>
+        <button class="filter-btn" data-role="Sniper" onclick="setRoleFilter(this)">Sniper</button>
+        <button class="filter-btn" data-role="Support" onclick="setRoleFilter(this)">Support</button>
+      </div>
+    </div>
+
+    <div class="players-grid" id="playersGrid">
+      <div class="loading-state">Loading players…</div>
+    </div>
+    <div id="noResults" style="display:none;" class="empty-state"><h3>No Players Found</h3></div>
+  </div>
+</section>
+
+<footer></footer>
+<script src="assets/js/app.js"></script>
+<script>
+let allPlayers = [];
+let activeStatus = 'all';
+let activeRole = 'all';
+
+document.addEventListener('DOMContentLoaded', async () => {
+  
+  renderNav('players');
+  renderFooter();
+  loadPlayers();
+  setTimeout(initFadeIn, 120);
+});
+
+function loadPlayers() {
+  allPlayers = await Api.getAll('players');
+  const allTeams = await Api.getAll('teams');
+
+  document.getElementById('statTotal').textContent = allPlayers.length;
+  document.getElementById('statActive').textContent = allPlayers.filter(p=>p.status==='active').length;
+
+  // Count MVPs and champions
+  let mvpCount = 0, champCount = 0;
+  allPlayers.forEach(p => {
+    (p.tournamentHistory||[]).forEach(h => {
+      if (h.award && h.award.toLowerCase().includes('mvp')) mvpCount++;
+      if (h.result === 'Champion') champCount++;
+    });
+  });
+  document.getElementById('statMVPs').textContent = mvpCount;
+  document.getElementById('statChamps').textContent = champCount;
+
+  renderCards(allPlayers, allTeams);
+}
+
+function setStatusFilter(btn) {
+  document.querySelectorAll('#statusFilters .filter-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  activeStatus = btn.dataset.status;
+  filterPlayers();
+}
+function setRoleFilter(btn) {
+  document.querySelectorAll('#roleFilters .filter-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  activeRole = btn.dataset.role;
+  filterPlayers();
+}
+async function filterPlayers() {
+  const q = document.getElementById('searchInput').value.toLowerCase();
+  const allTeams = await Api.getAll('teams');
+  let list = allPlayers;
+  if (activeStatus !== 'all') list = list.filter(p=>p.status===activeStatus);
+  if (activeRole !== 'all') list = list.filter(p=>p.role.includes(activeRole));
+  if (q) list = list.filter(p=>p.ign.toLowerCase().includes(q)||p.realName?.toLowerCase().includes(q));
+  renderCards(list, allTeams);
+}
+
+function renderCards(list, allTeams) {
+  const grid = document.getElementById('playersGrid');
+  const noR = document.getElementById('noResults');
+  if (!list.length) { grid.innerHTML=''; noR.style.display='block'; return; }
+  noR.style.display='none';
+  grid.innerHTML = list.map(p => {
+    const team = p.currentTeam ? allTeams.find(t=>t.id===p.currentTeam) : null;
+    const wins = (p.tournamentHistory||[]).filter(h=>h.result==='Champion').length;
+    const mvps = (p.tournamentHistory||[]).filter(h=>h.award?.includes('MVP')).length;
+    return `<div class="player-card fade-in" onclick="location.href='player-detail.html?id=${p.id}'">
+      <div class="player-card-top">
+        ${playerAvatarHTMLSync(p, 52)}
+        <div>
+          <span class="player-ign">${p.ign}</span>
+          <div class="player-realname">${p.realName||''}</div>
+        </div>
+      </div>
+      <div style="display:flex;gap:.5rem;flex-wrap:wrap;">
+        <span class="player-role-badge">${p.role}</span>
+        <span class="status-badge ${p.status==='active'?'status-active':p.status==='retired'?'status-disbanded':'status-inactive'}">${p.status}</span>
+      </div>
+      <div class="player-team-tag">Team: <strong>${team?team.name:(p.currentTeam||'Free Agent')}</strong></div>
+      <div style="display:flex;gap:1rem;padding-top:.75rem;border-top:1px solid rgba(255,255,255,0.04);">
+        <div style="text-align:center;">
+          <div style="font-family:'Bebas Neue',sans-serif;font-size:1.4rem;color:var(--gold);letter-spacing:1px;">${wins}</div>
+          <div style="font-family:'Space Mono',monospace;font-size:8px;color:var(--cinder);text-transform:uppercase;letter-spacing:1px;">Wins</div>
+        </div>
+        <div style="text-align:center;">
+          <div style="font-family:'Bebas Neue',sans-serif;font-size:1.4rem;color:var(--ember);letter-spacing:1px;">${mvps}</div>
+          <div style="font-family:'Space Mono',monospace;font-size:8px;color:var(--cinder);text-transform:uppercase;letter-spacing:1px;">MVPs</div>
+        </div>
+        <div style="text-align:center;">
+          <div style="font-family:'Bebas Neue',sans-serif;font-size:1.4rem;color:var(--fire);letter-spacing:1px;">${(p.tournamentHistory||[]).length}</div>
+          <div style="font-family:'Space Mono',monospace;font-size:8px;color:var(--cinder);text-transform:uppercase;letter-spacing:1px;">Tourneys</div>
+        </div>
+      </div>
+      <a class="tc-link" href="player-detail.html?id=${p.id}" onclick="event.stopPropagation()">View Profile →</a>
+    </div>`;
+  }).join('');
+  setTimeout(initFadeIn, 50);
+}
+</script>
+</body>
+</html>

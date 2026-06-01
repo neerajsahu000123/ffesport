@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Team Detail — Esports Archive</title>
+<link rel="stylesheet" href="assets/css/style.css">
+<style>
+.team-header-block { background:var(--ash); border:1px solid var(--soot); border-radius:var(--radius); padding:2.5rem; display:flex; gap:2rem; align-items:center; margin-bottom:2rem; }
+.team-header-info { flex:1; }
+.team-header-info h1 { font-family:'Bebas Neue',sans-serif; font-size:clamp(2.5rem,5vw,4rem); letter-spacing:3px; color:var(--white); line-height:1; margin-bottom:.5rem; }
+.roster-player { display:flex; align-items:center; gap:1rem; padding:.875rem 1rem; border-bottom:1px solid rgba(255,255,255,0.04); transition:var(--trans); cursor:pointer; }
+.roster-player:last-child { border-bottom:none; }
+.roster-player:hover { background:rgba(255,74,0,0.04); }
+.rp-role { font-family:'Space Mono',monospace; font-size:9px; letter-spacing:1px; text-transform:uppercase; color:var(--cinder); padding:2px 8px; border:1px solid var(--soot); }
+.hist-row { display:flex; align-items:center; gap:1rem; padding:.875rem 1rem; border-bottom:1px solid rgba(255,255,255,0.04); }
+.hist-row:last-child { border-bottom:none; }
+.hist-result { font-family:'Bebas Neue',sans-serif; font-size:1rem; letter-spacing:1px; }
+.hist-result.champion { color:var(--gold); }
+.hist-result.runner { color:var(--pale); }
+.hist-result.third { color:var(--ember); }
+</style>
+</head>
+<body>
+<nav></nav>
+<div class="mobile-menu" id="mobileMenu"></div>
+
+<section class="page-hero" id="teamHero">
+  <div class="container">
+    <div class="breadcrumb">
+      <a href="index.html">Home</a><span class="sep">›</span>
+      <a href="teams.html">Teams</a><span class="sep">›</span>
+      <span class="current" id="bcName">Loading…</span>
+    </div>
+    <span class="page-hero-tag" id="heroTag">// Team Profile</span>
+    <h1 class="page-hero-title" id="heroTitle">LOADING…</h1>
+  </div>
+</section>
+
+<section class="section-pad">
+  <div class="container" id="mainContent">
+    <div class="loading-state">Loading team profile…</div>
+  </div>
+</section>
+
+<footer></footer>
+<script src="assets/js/app.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', async () => {
+  
+  await renderNav('teams');
+  renderFooter();
+  loadTeam();
+  setTimeout(initFadeIn, 120);
+});
+
+function loadTeam() {
+  const id = getParam('id');
+  if (!id) { showError('No team ID.'); return; }
+  const team = await Api.getById('teams', id);
+  if (!team) { showError('Team not found.'); return; }
+
+  document.getElementById('bcName').textContent = team.name;
+  document.getElementById('heroTag').textContent = `// ${team.status.toUpperCase()} · ${team.region||'India'}`;
+  document.getElementById('heroTitle').textContent = team.name.toUpperCase();
+  document.title = `${team.name} — Esports Archive`;
+
+  const allPlayers = await Api.getAll('players');
+  const articles = (await Api.getAll('articles')).filter(a=>a.relatedTeam===id);
+
+  // Current roster players
+  const rosterPlayers = (team.currentRoster||[]).map(pid=>allPlayers.find(p=>p.id===pid)).filter(Boolean);
+  // Former players
+  const formerPlayers = (team.formerPlayers||[]).map(pid=>allPlayers.find(p=>p.id===pid)).filter(Boolean);
+
+  const rosterHTML = rosterPlayers.length
+    ? rosterPlayers.map(p=>`
+        <div class="roster-player" onclick="location.href='player-detail.html?id=${p.id}'">
+          ${playerAvatarHTMLSync(p,42)}
+          <div style="flex:1;">
+            <div style="font-family:'Bebas Neue',sans-serif;font-size:1.1rem;letter-spacing:1.5px;color:var(--white);">${p.ign}</div>
+            <div style="font-family:'Space Mono',monospace;font-size:10px;color:var(--cinder);">${p.realName}</div>
+          </div>
+          <span class="rp-role">${p.role}</span>
+          <span style="font-family:'Space Mono',monospace;font-size:10px;color:var(--fire);">→</span>
+        </div>`).join('')
+    : '<div style="padding:1rem;color:var(--cinder);font-size:13px;">No current roster data.</div>';
+
+  const formerHTML = formerPlayers.length
+    ? formerPlayers.map(p=>`
+        <div class="roster-player" onclick="location.href='player-detail.html?id=${p.id}'">
+          ${playerAvatarHTMLSync(p,42)}
+          <div style="flex:1;">
+            <div style="font-family:'Bebas Neue',sans-serif;font-size:1.1rem;letter-spacing:1.5px;color:var(--pale);">${p.ign}</div>
+            <div style="font-family:'Space Mono',monospace;font-size:10px;color:var(--cinder);">${p.realName}</div>
+          </div>
+          <span class="rp-role">${p.role}</span>
+        </div>`).join('')
+    : '<div style="padding:1rem;color:var(--cinder);font-size:13px;">No former player data.</div>';
+
+  const histHTML = (team.tournamentHistory||[]).map(h=>{
+    const cls = h.result.toLowerCase().includes('champion') ? 'champion' : h.result.toLowerCase().includes('runner') ? 'runner' : h.result.toLowerCase().includes('3rd') ? 'third' : '';
+    return `<div class="hist-row">
+      <div style="flex:1;font-size:14px;font-weight:600;color:var(--cream);">${h.tournament}</div>
+      <div class="hist-result ${cls}">${h.result}</div>
+      <div style="font-size:13px;color:var(--gold);">${h.prize||''}</div>
+    </div>`;
+  }).join('') || '<div style="padding:1rem;color:var(--cinder);">No history data.</div>';
+
+  const artHTML = articles.length ? articles.map(a=>`
+    <div class="article-preview" onclick="location.href='article-detail.html?id=${a.id}'">
+      <span class="ap-cat">${a.category}</span>
+      <div class="ap-title">${a.title}</div>
+      <div class="ap-date">${formatDate(a.date)}</div>
+    </div>`).join('') : '';
+
+  document.getElementById('mainContent').innerHTML = `
+    <div class="detail-layout">
+      <!-- SIDEBAR -->
+      <div>
+        <div class="detail-sidebar fade-in">
+          <div class="detail-sidebar-header">
+            ${teamLogoHTMLSync(team, 96)}
+            <div style="margin-top:1rem;">
+              <div style="font-family:'Bebas Neue',sans-serif;font-size:1.75rem;letter-spacing:2px;color:var(--white);">${team.shortName}</div>
+              <div style="font-family:'Space Mono',monospace;font-size:9px;color:var(--cinder);letter-spacing:1px;text-transform:uppercase;">${team.name}</div>
+            </div>
+            <div style="margin-top:.75rem;"><span class="status-badge ${getStatusClass(team.status)}">${team.status}</span></div>
+            <div style="margin-top:1rem;font-family:'Bebas Neue',sans-serif;font-size:3rem;color:var(--gold);letter-spacing:2px;line-height:1;">${team.championships||0}</div>
+            <div style="font-family:'Space Mono',monospace;font-size:9px;color:var(--cinder);letter-spacing:1.5px;text-transform:uppercase;">Championships</div>
+          </div>
+          <div style="padding:1.25rem;">
+            <div class="info-row"><span class="info-label">Founded</span><span class="info-value">${formatDate(team.founded)}</span></div>
+            ${team.disbanded?`<div class="info-row"><span class="info-label">Disbanded</span><span class="info-value">${formatDate(team.disbanded)}</span></div>`:''}
+            <div class="info-row"><span class="info-label">Owner</span><span class="info-value">${team.owner||'—'}</span></div>
+            <div class="info-row"><span class="info-label">Manager</span><span class="info-value">${team.manager||'—'}</span></div>
+            <div class="info-row"><span class="info-label">Coach</span><span class="info-value">${team.coach||'—'}</span></div>
+            <div class="info-row"><span class="info-label">Region</span><span class="info-value">${team.region||'India'}</span></div>
+          </div>
+        </div>
+        <div class="info-block fade-in" style="margin-top:1.5rem;">
+          <div class="info-block-title">Achievements</div>
+          <div class="achievement-list">
+            ${(team.achievements||[]).map(a=>`<span class="achievement-badge">${a}</span>`).join('')||'<span style="color:var(--cinder);font-size:13px;">No achievements recorded.</span>'}
+          </div>
+        </div>
+      </div>
+
+      <!-- MAIN -->
+      <div class="detail-main">
+        <div class="info-block fade-in">
+          <div class="info-block-title">About ${team.name}</div>
+          <div style="font-size:15px;color:var(--pale);line-height:1.8;">${team.bio||'No bio available.'}</div>
+        </div>
+
+        <div class="info-block fade-in">
+          <div class="info-block-title">Current Roster</div>
+          ${rosterHTML}
+        </div>
+
+        <div class="info-block fade-in">
+          <div class="info-block-title">Former Players</div>
+          ${formerHTML}
+        </div>
+
+        <div class="info-block fade-in">
+          <div class="info-block-title">Tournament History</div>
+          ${histHTML}
+        </div>
+
+        ${artHTML ? `<div class="info-block fade-in"><div class="info-block-title">Related Articles</div><div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:1rem;">${artHTML}</div></div>` : ''}
+      </div>
+    </div>`;
+  setTimeout(initFadeIn, 80);
+}
+
+function showError(msg) {
+  document.getElementById('heroTitle').textContent = 'NOT FOUND';
+  document.getElementById('mainContent').innerHTML = `<div class="empty-state"><h3>${msg}</h3><a href="teams.html" class="btn-outline" style="margin-top:1rem;">← Back to Teams</a></div>`;
+}
+</script>
+</body>
+</html>

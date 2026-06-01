@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Upcoming Events — Esports Archive</title>
+<link rel="stylesheet" href="assets/css/style.css">
+<style>
+.event-card {
+  background:var(--ash); border:1px solid var(--soot);
+  border-radius:var(--radius); overflow:hidden;
+  transition:var(--trans); position:relative;
+}
+.event-card:hover { border-color:rgba(255,74,0,0.4); }
+.event-card-top {
+  background:var(--smoke); border-bottom:1px solid var(--soot);
+  padding:1.5rem; display:flex; align-items:center; gap:1.5rem;
+}
+.event-date-badge { text-align:center; flex-shrink:0; }
+.event-date-badge .day { font-family:'Bebas Neue',sans-serif; font-size:3rem; color:var(--fire); line-height:1; letter-spacing:2px; }
+.event-date-badge .month { font-family:'Space Mono',monospace; font-size:10px; color:var(--cinder); letter-spacing:2px; text-transform:uppercase; }
+.event-date-badge .year { font-family:'Space Mono',monospace; font-size:9px; color:var(--soot); letter-spacing:1px; }
+.event-info { flex:1; }
+.event-info h2 { font-family:'Bebas Neue',sans-serif; font-size:1.5rem; letter-spacing:2px; color:var(--white); line-height:1.2; margin-bottom:.5rem; }
+.event-body { padding:1.5rem; }
+.event-meta-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(150px,1fr)); gap:1rem; margin-bottom:1.25rem; }
+.event-meta-item label { font-family:'Space Mono',monospace; font-size:9px; letter-spacing:1.5px; text-transform:uppercase; color:var(--cinder); display:block; margin-bottom:4px; }
+.event-meta-item span { font-size:14px; font-weight:600; color:var(--cream); }
+.event-description { font-size:14px; color:var(--pale); line-height:1.7; padding:1rem; background:rgba(255,74,0,0.03); border:1px solid rgba(255,74,0,0.08); }
+.countdown-badge {
+  font-family:'Space Mono',monospace; font-size:10px; letter-spacing:1px;
+  color:var(--fire); border:1px solid rgba(255,74,0,0.2);
+  padding:4px 10px; display:inline-block;
+}
+</style>
+</head>
+<body>
+<nav></nav>
+<div class="mobile-menu" id="mobileMenu"></div>
+
+<section class="page-hero">
+  <div class="container">
+    <div class="breadcrumb"><a href="index.html">Home</a><span class="sep">›</span><span class="current">Upcoming Events</span></div>
+    <span class="page-hero-tag">// Schedule</span>
+    <h1 class="page-hero-title">UPCOMING<br>EVENTS</h1>
+    <p class="page-hero-desc">Future Free Fire India tournaments — dates, prize pools, formats, and registration status.</p>
+  </div>
+</section>
+
+<section class="section-pad">
+  <div class="container">
+    <div style="display:flex;gap:1rem;align-items:center;flex-wrap:wrap;margin-bottom:2rem;">
+      <div class="filter-bar" id="statusFilters" style="margin-bottom:0;">
+        <button class="filter-btn active" data-status="all" onclick="setFilter(this)">All Events</button>
+        <button class="filter-btn" data-status="open" onclick="setFilter(this)">🟢 Reg. Open</button>
+        <button class="filter-btn" data-status="announced" onclick="setFilter(this)">📢 Announced</button>
+        <button class="filter-btn" data-status="tba" onclick="setFilter(this)">🔵 TBA</button>
+      </div>
+    </div>
+
+    <div id="eventsContainer" style="display:flex;flex-direction:column;gap:1.5rem;">
+      <div class="loading-state">Loading upcoming events…</div>
+    </div>
+    <div id="noResults" style="display:none;" class="empty-state"><h3>No Events Found</h3></div>
+  </div>
+</section>
+
+<footer></footer>
+<script src="assets/js/app.js"></script>
+<script>
+let allEvents = [];
+let activeStatus = 'all';
+
+document.addEventListener('DOMContentLoaded', async () => {
+  
+  await renderNav('upcoming');
+  renderFooter();
+  allEvents = (await Api.getAll('upcoming')).sort((a,b)=>new Date(a.date)-new Date(b.date));
+  renderEvents(allEvents);
+  setTimeout(initFadeIn, 120);
+});
+
+function setFilter(btn) {
+  document.querySelectorAll('#statusFilters .filter-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  activeStatus = btn.dataset.status;
+  let list = allEvents;
+  if (activeStatus !== 'all') list = allEvents.filter(e=>e.registrationStatus===activeStatus);
+  renderEvents(list);
+}
+
+function daysUntil(dateStr) {
+  const now = new Date();
+  const target = new Date(dateStr);
+  const diff = Math.ceil((target - now) / (1000*60*60*24));
+  if (diff < 0) return 'PAST';
+  if (diff === 0) return 'TODAY';
+  if (diff === 1) return '1 DAY';
+  return `${diff} DAYS`;
+}
+
+function renderEvents(list) {
+  const container = document.getElementById('eventsContainer');
+  const noR = document.getElementById('noResults');
+  if (!list.length) { container.innerHTML=''; noR.style.display='block'; return; }
+  noR.style.display='none';
+  container.innerHTML = list.map(e=>`
+    <div class="event-card fade-in">
+      <div class="event-card-top">
+        <div style="text-align:center;background:rgba(255,74,0,0.05);border:1px solid rgba(255,74,0,0.15);padding:1rem 1.25rem;border-radius:var(--radius);">
+          <div class="day" style="font-family:'Bebas Neue',sans-serif;font-size:2.5rem;color:var(--fire);line-height:1;letter-spacing:2px;">${getDayNum(e.date)}</div>
+          <div class="month" style="font-family:'Space Mono',monospace;font-size:10px;color:var(--cinder);letter-spacing:2px;text-transform:uppercase;">${getMonthName(e.date)}</div>
+          <div style="font-family:'Space Mono',monospace;font-size:9px;color:var(--soot);">${new Date(e.date).getFullYear()}</div>
+        </div>
+        <div class="event-info">
+          <h2>${e.name}</h2>
+          <div style="display:flex;gap:.75rem;align-items:center;flex-wrap:wrap;">
+            <span class="upcoming-status ${getRegStatusClass(e.registrationStatus)}">${getRegStatusLabel(e.registrationStatus)}</span>
+            <span class="countdown-badge">⏱ ${daysUntil(e.date)}</span>
+          </div>
+        </div>
+        <div style="text-align:right;flex-shrink:0;">
+          <div style="font-family:'Bebas Neue',sans-serif;font-size:2rem;color:var(--gold);letter-spacing:2px;line-height:1;">${e.prizePool||'TBA'}</div>
+          <div style="font-family:'Space Mono',monospace;font-size:9px;color:var(--cinder);text-transform:uppercase;letter-spacing:1px;">Prize Pool</div>
+        </div>
+      </div>
+      <div class="event-body">
+        <div class="event-meta-grid">
+          <div class="event-meta-item"><label>Organizer</label><span>${e.organizer}</span></div>
+          <div class="event-meta-item"><label>Format</label><span>${e.format}</span></div>
+          <div class="event-meta-item"><label>Team Slots</label><span>${e.teamsSlots||'TBA'}</span></div>
+          <div class="event-meta-item"><label>Location</label><span>${e.location||'TBA'}</span></div>
+          <div class="event-meta-item"><label>Start Date</label><span>${formatDate(e.date)}</span></div>
+          ${e.endDate?`<div class="event-meta-item"><label>End Date</label><span>${formatDate(e.endDate)}</span></div>`:''}
+        </div>
+        ${e.description?`<div class="event-description">${e.description}</div>`:''}
+      </div>
+    </div>`).join('');
+  setTimeout(initFadeIn, 50);
+}
+</script>
+</body>
+</html>
